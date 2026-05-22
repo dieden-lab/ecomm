@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order Confirmed — MerkleShop</title>
-  <!-- TODO: GTM Head snippet -->
+  <!-- GTM HEAD: (function(w,d,s,l,i){...})(window,document,'script','dataLayer','GTM-XXXXXXX'); -->
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
 
@@ -338,14 +338,20 @@ input, select, textarea { font-family: var(--font-body); }
   .container { padding: 0 20px; }
 }
 
-</style>
+  </style>
+  
 </head>
 <body>
-  <!-- TODO: GTM Body noscript -->
+  <!-- GTM BODY: <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"...></noscript> -->
 
   <nav class="nav">
     <div class="nav-inner">
-      <div class="nav-left"></div>
+      
+      <div class="nav-left">
+        <a href="plp.html" >Collection</a>
+        <a href="plp.html?cat=Outerwear">Outerwear</a>
+        <a href="plp.html?cat=Knitwear">Knitwear</a>
+      </div>
       <a href="index.html" class="nav-logo">Merkle<span>Shop</span></a>
       <div class="nav-right">
         <a href="cart.html" class="cart-btn">
@@ -359,34 +365,25 @@ input, select, textarea { font-family: var(--font-body); }
     </div>
   </nav>
 
+  
   <main>
     <div class="thankyou-wrap">
       <div class="ty-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
-      <h1 class="ty-title">Thank<br><em>You.</em></h1>
-      <p class="ty-sub" id="ty-sub">Your order has been confirmed. We'll send a confirmation to your email shortly.</p>
-
+      <h1 class="ty-title">Order<br><em>Confirmed!</em></h1>
+      <p class="ty-sub" id="ty-sub">Your order is confirmed. You will receive a confirmation email shortly.</p>
       <div class="order-summary-box" id="order-box"></div>
-
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
         <a href="index.html" class="btn-primary">Back to Home</a>
         <a href="plp.html" class="btn-secondary">Continue Shopping</a>
       </div>
     </div>
   </main>
+  <footer class="footer"><div class="footer-inner"><div class="footer-logo">Merkle<span>Shop</span></div><p class="footer-copy">© 2025 MerkleShop. Demo store.</p></div></footer>
+  <div id="toast" class="toast"></div>
 
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-logo">Merkle<span>Shop</span></div>
-      <p class="footer-copy">© 2025 MerkleShop. Demo store — no real transactions.</p>
-    </div>
-  </footer>
-
-  <script>
-const PRODUCTS = [
+  <script>const PRODUCTS = [
   {
     id: 1,
     name: "Oversized Wool Coat",
@@ -508,10 +505,8 @@ const PRODUCTS = [
     new: false
   }
 ];
-
 </script>
-  <script>
-const CART_KEY = 'merkleshop_cart';
+  <script>const CART_KEY = 'merkleshop_cart';
 window.dataLayer = window.dataLayer || [];
 
 const Cart = {
@@ -639,57 +634,49 @@ function formatPrice(n) {
 document.addEventListener('DOMContentLoaded', () => {
   Cart.updateBadge();
 });
-
 </script>
   <script>
+
     window.dataLayer = window.dataLayer || [];
 
-    const orderRaw = localStorage.getItem('merkleshop_last_order');
-    const order = orderRaw ? JSON.parse(orderRaw) : null;
-
-    if (!order) {
-      document.getElementById('order-box').innerHTML =
-        '<p style="text-align:center;font-size:13px;color:var(--mid)">Order details not available. Please check your email.</p>';
+    const raw = localStorage.getItem('merkleshop_last_order');
+    if (!raw) {
+      document.getElementById('order-box').innerHTML = '<p style="text-align:center;font-size:13px;color:var(--mid)">Order details not available. Check your email for confirmation.</p>';
     } else {
-      document.getElementById('ty-sub').textContent =
-        `Your order has been confirmed. We'll send a confirmation to ${order.email} shortly.`;
+      const order = JSON.parse(raw);
 
-      const itemsHTML = order.items.map(item => {
-        const p = PRODUCTS.find(p => p.id === item.productId);
+      document.getElementById('ty-sub').textContent =
+        'Order confirmed! A summary will be sent to ' + order.email;
+
+      const itemsHTML = order.items.map(function(item) {
+        const p = PRODUCTS.find(function(p) { return p.id === item.productId; });
         if (!p) return '';
-        return `
-          <div class="ty-item">
-            <span class="name">${p.name} <span style="color:var(--mid);font-weight:300">×${item.quantity}</span></span>
-            <span>${formatPrice(p.price * item.quantity)}</span>
-          </div>`;
+        return '<div class="ty-item"><span class="name">' + p.name + ' <span style="color:var(--mid);font-weight:300">x' + item.quantity + '</span></span><span>' + formatPrice(p.price * item.quantity) + '</span></div>';
       }).join('');
 
-      document.getElementById('order-box').innerHTML = `
-        <div class="order-ref">Order <span>${order.id}</span> · <span>${order.date}</span></div>
-        ${itemsHTML}
-        <div class="ty-item"><span>Shipping</span><span>${order.shipping === 0 ? 'Free' : formatPrice(order.shipping)}</span></div>
-        <div class="ty-item" style="font-weight:400;font-size:15px;padding-top:12px;border-bottom:none">
-          <span>Total</span>
-          <span style="font-family:var(--font-display);font-size:20px">${formatPrice(order.total)}</span>
-        </div>`;
+      document.getElementById('order-box').innerHTML =
+        '<div class="order-ref">Order <span>' + order.id + '</span> &middot; <span>' + order.date + '</span></div>' +
+        itemsHTML +
+        '<div class="ty-item"><span>Shipping</span><span>' + (order.shipping === 0 ? 'Free' : formatPrice(order.shipping)) + '</span></div>' +
+        '<div class="ty-item" style="font-weight:500;font-size:15px;padding-top:12px;border-bottom:none"><span>Total</span><span style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--blue)">' + formatPrice(order.total) + '</span></div>';
 
-      // DL: purchase — fires here (single source of truth)
-        dataLayer.push({ ecommerce: null });
-        dataLayer.push({
-          event: 'purchase',
-          ecommerce: {
-            transaction_id: order.id,
-            value: order.total,
-            tax: parseFloat((order.total * 0.22).toFixed(2)),
-            shipping: order.shipping,
-            currency: 'EUR',
-            items: order.items.map(item => {
-              const p = PRODUCTS.find(p => p.id === item.productId);
-              return { item_id: String(p.id), item_name: p.name, item_category: p.category, price: p.price, quantity: item.quantity };
-            })
-          }
-        });
-      }
+      // GA4 purchase event — single source of truth
+      const dlItems = order.items.map(function(item) {
+        const p = PRODUCTS.find(function(p) { return p.id === item.productId; });
+        return { item_id: String(p.id), item_name: p.name, item_category: p.category, price: p.price, quantity: item.quantity };
+      });
+      dataLayer.push({ ecommerce: null });
+      dataLayer.push({
+        event: 'purchase',
+        ecommerce: {
+          transaction_id: order.id,
+          value: order.total,
+          tax: parseFloat((order.total * 0.22).toFixed(2)),
+          shipping: order.shipping,
+          currency: 'EUR',
+          items: dlItems
+        }
+      });
     }
   </script>
 </body>
