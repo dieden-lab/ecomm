@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Checkout — MerkleShop</title>
-  <!-- TODO: GTM Head snippet -->
+  <!-- GTM HEAD: (function(w,d,s,l,i){...})(window,document,'script','dataLayer','GTM-XXXXXXX'); -->
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
 
@@ -338,148 +338,103 @@ input, select, textarea { font-family: var(--font-body); }
   .container { padding: 0 20px; }
 }
 
-</style>
+  </style>
+  
 </head>
 <body>
-  <!-- TODO: GTM Body noscript -->
+  <!-- GTM BODY: <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"...></noscript> -->
 
   <nav class="nav">
     <div class="nav-inner">
+      
       <div class="nav-left">
-        <a href="cart.html" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid)">← Back to Cart</a>
+        <a href="plp.html" >Collection</a>
+        <a href="plp.html?cat=Outerwear">Outerwear</a>
+        <a href="plp.html?cat=Knitwear">Knitwear</a>
       </div>
       <a href="index.html" class="nav-logo">Merkle<span>Shop</span></a>
       <div class="nav-right">
-        <span style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid)">Secure Checkout</span>
+        <a href="cart.html" class="cart-btn">
+          <span>Cart</span>
+          <span class="cart-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span id="cart-count"></span>
+          </span>
+        </a>
       </div>
     </div>
   </nav>
 
+  
   <main class="container">
-    <div class="page-header">
-      <h1>Checkout</h1>
-    </div>
+    <div class="page-header"><h1>Checkout</h1></div>
     <div class="checkout-layout">
-      <!-- Left: Form -->
       <div>
         <div class="checkout-section">
           <h2 class="checkout-section-title">Contact</h2>
           <div class="form-grid full">
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" placeholder="your@email.com">
-            </div>
+            <div class="form-group"><label>Email</label><input type="email" id="f-email" placeholder="your@email.com"></div>
           </div>
         </div>
-
         <div class="checkout-section">
           <h2 class="checkout-section-title">Shipping Address</h2>
           <div class="form-grid">
-            <div class="form-group">
-              <label>First Name</label>
-              <input type="text" id="fname" placeholder="Mario">
-            </div>
-            <div class="form-group">
-              <label>Last Name</label>
-              <input type="text" id="lname" placeholder="Rossi">
-            </div>
-            <div class="form-group span-2">
-              <label>Address</label>
-              <input type="text" id="address" placeholder="Via Roma, 1">
-            </div>
-            <div class="form-group">
-              <label>City</label>
-              <input type="text" id="city" placeholder="Milano">
-            </div>
-            <div class="form-group">
-              <label>Postal Code</label>
-              <input type="text" id="zip" placeholder="20121">
-            </div>
-            <div class="form-group span-2">
-              <label>Country</label>
-              <select id="country">
-                <option value="IT">Italy</option>
-                <option value="DE">Germany</option>
-                <option value="FR">France</option>
-                <option value="UK">United Kingdom</option>
-              </select>
+            <div class="form-group"><label>First Name</label><input type="text" id="f-fname" placeholder="Mario"></div>
+            <div class="form-group"><label>Last Name</label><input type="text" id="f-lname" placeholder="Rossi"></div>
+            <div class="form-group span-2"><label>Address</label><input type="text" id="f-address" placeholder="Via Roma, 1"></div>
+            <div class="form-group"><label>City</label><input type="text" id="f-city" placeholder="Milano"></div>
+            <div class="form-group"><label>Postal Code</label><input type="text" id="f-zip" placeholder="20121"></div>
+            <div class="form-group span-2"><label>Country</label>
+              <select id="f-country"><option>Italy</option><option>Germany</option><option>France</option><option>United Kingdom</option></select>
             </div>
           </div>
         </div>
-
         <div class="checkout-section">
           <h2 class="checkout-section-title">Shipping Method</h2>
           <div style="display:flex;flex-direction:column;gap:10px">
-            <label id="lbl-std" style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--charcoal);padding:16px;border-radius:var(--radius);cursor:pointer">
+            <label id="lbl-std" style="display:flex;align-items:center;justify-content:space-between;border:2px solid var(--blue);padding:14px;border-radius:3px;cursor:pointer">
               <div style="display:flex;align-items:center;gap:12px">
-                <input type="radio" name="shipping" value="standard" checked style="accent-color:var(--charcoal)">
-                <div>
-                  <p style="font-size:14px;font-weight:400">Standard Delivery</p>
-                  <p style="font-size:12px;color:var(--mid)">3–5 working days</p>
-                </div>
+                <input type="radio" name="ship" value="standard" checked style="accent-color:var(--blue)">
+                <div><p style="font-size:14px;font-weight:500">Standard Delivery</p><p style="font-size:12px;color:var(--mid)">3–5 working days</p></div>
               </div>
-              <span id="shipping-std-price" style="font-family:var(--font-display);font-size:16px">—</span>
+              <span id="std-price" style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--blue)">—</span>
             </label>
-            <label id="lbl-exp" style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);padding:16px;border-radius:var(--radius);cursor:pointer">
+            <label id="lbl-exp" style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);padding:14px;border-radius:3px;cursor:pointer">
               <div style="display:flex;align-items:center;gap:12px">
-                <input type="radio" name="shipping" value="express" style="accent-color:var(--charcoal)">
-                <div>
-                  <p style="font-size:14px;font-weight:400">Express Delivery</p>
-                  <p style="font-size:12px;color:var(--mid)">1–2 working days</p>
-                </div>
+                <input type="radio" name="ship" value="express" style="accent-color:var(--blue)">
+                <div><p style="font-size:14px;font-weight:500">Express Delivery</p><p style="font-size:12px;color:var(--mid)">1–2 working days</p></div>
               </div>
-              <span style="font-family:var(--font-display);font-size:16px">€18</span>
+              <span style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--blue)">€18</span>
             </label>
           </div>
         </div>
-
         <div class="checkout-section">
           <h2 class="checkout-section-title">Payment</h2>
-          <div style="background:var(--cream);border:1px dashed var(--border);padding:20px;border-radius:var(--radius);margin-bottom:16px">
-            <p style="font-size:12px;color:var(--mid);text-align:center;letter-spacing:0.05em">🔒 Demo store — payment fields are decorative only</p>
+          <div style="background:var(--blue-light);border:1px dashed var(--border);padding:16px;border-radius:3px;margin-bottom:14px;text-align:center">
+            <p style="font-size:12px;color:var(--mid)">🔒 Demo store — payment fields are decorative</p>
           </div>
           <div class="form-grid">
-            <div class="form-group span-2">
-              <label>Card Number</label>
-              <input type="text" id="card-num" placeholder="1234 5678 9012 3456" maxlength="19">
-            </div>
-            <div class="form-group">
-              <label>Expiry</label>
-              <input type="text" id="card-exp" placeholder="MM / YY" maxlength="7">
-            </div>
-            <div class="form-group">
-              <label>CVV</label>
-              <input type="text" id="card-cvv" placeholder="123" maxlength="4">
-            </div>
+            <div class="form-group span-2"><label>Card Number</label><input type="text" id="f-card" placeholder="1234 5678 9012 3456" maxlength="19"></div>
+            <div class="form-group"><label>Expiry</label><input type="text" id="f-exp" placeholder="MM / YY" maxlength="7"></div>
+            <div class="form-group"><label>CVV</label><input type="text" id="f-cvv" placeholder="123" maxlength="4"></div>
           </div>
         </div>
-
-        <button class="btn-primary" style="width:100%;justify-content:center;padding:18px" onclick="placeOrder()">
+        <button class="btn-primary" id="place-btn" style="width:100%;justify-content:center;padding:17px;font-size:13px" onclick="placeOrder()">
           Place Order
         </button>
-        <p style="font-size:11px;color:var(--mid);text-align:center;margin-top:12px;line-height:1.6">
-          By placing your order you agree to our Terms of Service and Privacy Policy.
-        </p>
+        <p id="err-msg" style="display:none;color:var(--red);font-size:12px;text-align:center;margin-top:10px">Please fill in all required fields.</p>
       </div>
-
-      <!-- Right: Order Summary -->
-      <div class="cart-summary" style="position:sticky;top:calc(var(--nav-h) + 24px)">
+      <div class="cart-summary" style="position:sticky;top:calc(var(--nav-h) + 20px)">
         <h2 class="summary-title">Your Order</h2>
-        <div id="summary-items"></div>
-        <div id="summary-totals"></div>
+        <div id="sum-items"></div>
+        <div id="sum-totals"></div>
       </div>
     </div>
   </main>
+  <footer class="footer"><div class="footer-inner"><div class="footer-logo">Merkle<span>Shop</span></div><p class="footer-copy">© 2025 MerkleShop. Demo store.</p></div></footer>
+  <div id="toast" class="toast"></div>
 
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-logo">Merkle<span>Shop</span></div>
-      <p class="footer-copy">© 2025 MerkleShop. Demo store — no real transactions.</p>
-    </div>
-  </footer>
-
-  <script>
-const PRODUCTS = [
+  <script>const PRODUCTS = [
   {
     id: 1,
     name: "Oversized Wool Coat",
@@ -601,10 +556,8 @@ const PRODUCTS = [
     new: false
   }
 ];
-
 </script>
-  <script>
-const CART_KEY = 'merkleshop_cart';
+  <script>const CART_KEY = 'merkleshop_cart';
 window.dataLayer = window.dataLayer || [];
 
 const Cart = {
@@ -732,105 +685,100 @@ function formatPrice(n) {
 document.addEventListener('DOMContentLoaded', () => {
   Cart.updateBadge();
 });
-
 </script>
   <script>
+
     window.dataLayer = window.dataLayer || [];
 
-    const items = Cart.get();
-    if (items.length === 0) window.location.href = 'cart.html';
+    const cartItems = Cart.get();
+    if (cartItems.length === 0) { window.location.href = 'cart.html'; }
 
     const subtotal = Cart.total();
-    const stdShipping = subtotal >= 200 ? 0 : 12;
-    let shippingCost = stdShipping;
+    const stdShip = subtotal >= 200 ? 0 : 12;
+    let shippingCost = stdShip;
 
-    document.getElementById('shipping-std-price').textContent = stdShipping === 0 ? 'Free' : '€' + stdShipping;
+    document.getElementById('std-price').textContent = stdShip === 0 ? 'Free' : '€' + stdShip;
 
-    // Render summary items
-    document.getElementById('summary-items').innerHTML = items.map(item => {
+    // Render order summary items
+    document.getElementById('sum-items').innerHTML = cartItems.map(item => {
       const p = PRODUCTS.find(p => p.id === item.productId);
       if (!p) return '';
-      return `
-        <div style="display:flex;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
-          <div style="width:60px;flex-shrink:0;aspect-ratio:3/4;background:var(--border);border-radius:var(--radius);overflow:hidden">
-            <img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">
-          </div>
-          <div style="flex:1">
-            <p style="font-size:13px;font-weight:400;margin-bottom:2px">${p.name}</p>
-            <p style="font-size:11px;color:var(--mid)">Size ${item.size} · Qty ${item.quantity}</p>
-          </div>
-          <p style="font-family:var(--font-display);font-size:16px;white-space:nowrap">${formatPrice(p.price * item.quantity)}</p>
-        </div>`;
+      return `<div style="display:flex;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+        <div style="width:56px;flex-shrink:0;aspect-ratio:3/4;background:var(--border);border-radius:3px;overflow:hidden"><img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover"></div>
+        <div style="flex:1"><p style="font-size:13px;font-weight:500;margin-bottom:2px">${p.name}</p><p style="font-size:11px;color:var(--mid)">Size ${item.size} · Qty ${item.quantity}</p></div>
+        <p style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--blue);white-space:nowrap">${formatPrice(p.price * item.quantity)}</p>
+      </div>`;
     }).join('');
 
     function updateTotals() {
       const total = subtotal + shippingCost;
-      document.getElementById('summary-totals').innerHTML = `
+      document.getElementById('sum-totals').innerHTML = `
         <div class="summary-row"><span>Subtotal</span><span>${formatPrice(subtotal)}</span></div>
         <div class="summary-row"><span>Shipping</span><span>${shippingCost === 0 ? 'Free' : formatPrice(shippingCost)}</span></div>
         <div class="summary-row total"><span>Total</span><span class="amount">${formatPrice(total)}</span></div>`;
     }
+    updateTotals();
 
-    document.querySelectorAll('input[name="shipping"]').forEach(radio => {
-      radio.addEventListener('change', e => {
-        shippingCost = e.target.value === 'express' ? 18 : stdShipping;
-        document.getElementById('lbl-std').style.borderColor = e.target.value === 'standard' ? 'var(--charcoal)' : 'var(--border)';
-        document.getElementById('lbl-exp').style.borderColor = e.target.value === 'express' ? 'var(--charcoal)' : 'var(--border)';
+    document.querySelectorAll('input[name="ship"]').forEach(r => {
+      r.addEventListener('change', e => {
+        shippingCost = e.target.value === 'express' ? 18 : stdShip;
+        document.getElementById('lbl-std').style.border = e.target.value === 'standard' ? '2px solid var(--blue)' : '1px solid var(--border)';
+        document.getElementById('lbl-exp').style.border = e.target.value === 'express' ? '2px solid var(--blue)' : '1px solid var(--border)';
         updateTotals();
         dataLayer.push({ ecommerce: null });
-        dataLayer.push({
-          event: 'add_shipping_info',
-          ecommerce: { currency: 'EUR', value: subtotal + shippingCost, shipping_tier: e.target.value, items: Cart.getItemsForDL() }
-        });
+        dataLayer.push({ event: 'add_shipping_info', ecommerce: { currency: 'EUR', value: subtotal + shippingCost, shipping_tier: e.target.value, items: Cart.getItemsForDL() } });
       });
     });
 
-    function placeOrder() {
-      const required = ['email', 'fname', 'lname', 'address', 'city', 'zip'];
-      let valid = true;
-      required.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el.value.trim()) {
-          el.style.borderColor = 'var(--accent)';
-          valid = false;
-        } else {
-          el.style.borderColor = '';
-        }
-      });
-      if (!valid) return;
-
-      const orderId = 'ARCO-' + Date.now().toString(36).toUpperCase();
-      const total = subtotal + shippingCost;
-
-      // purchase event fires on thankyou.html
-      const order = {
-        id: orderId,
-        items: Cart.get(),
-        subtotal,
-        shipping: shippingCost,
-        total,
-        email: document.getElementById('email').value,
-        name: document.getElementById('fname').value + ' ' + document.getElementById('lname').value,
-        date: new Date().toLocaleDateString('it-IT')
-      };
-      localStorage.setItem('merkleshop_last_order', JSON.stringify(order));
-      sessionStorage.setItem('purchase_dl_fired', '1');
-
-      Cart.clear();
-      window.location.href = 'thankyou.html';
-    }
-
-    document.getElementById('card-num').addEventListener('input', e => {
-      let v = e.target.value.replace(/\D/g, '').substring(0, 16);
-      e.target.value = v.replace(/(.{4})/g, '$1 ').trim();
+    // Card number formatting
+    document.getElementById('f-card').addEventListener('input', e => {
+      let v = e.target.value.replace(/\D/g,'').substring(0,16);
+      e.target.value = v.replace(/(.{4})/g,'$1 ').trim();
     });
-    document.getElementById('card-exp').addEventListener('input', e => {
-      let v = e.target.value.replace(/\D/g, '').substring(0, 4);
-      if (v.length >= 2) v = v.substring(0, 2) + ' / ' + v.substring(2);
+    document.getElementById('f-exp').addEventListener('input', e => {
+      let v = e.target.value.replace(/\D/g,'').substring(0,4);
+      if (v.length >= 2) v = v.substring(0,2) + ' / ' + v.substring(2);
       e.target.value = v;
     });
 
-    updateTotals();
+    function placeOrder() {
+      const fields = [
+        { id: 'f-email', label: 'Email' },
+        { id: 'f-fname', label: 'First Name' },
+        { id: 'f-lname', label: 'Last Name' },
+        { id: 'f-address', label: 'Address' },
+        { id: 'f-city', label: 'City' },
+        { id: 'f-zip', label: 'Postal Code' }
+      ];
+      let valid = true;
+      fields.forEach(({ id }) => {
+        const el = document.getElementById(id);
+        const empty = !el || !el.value.trim();
+        if (el) el.style.borderColor = empty ? 'var(--red)' : '';
+        if (empty) valid = false;
+      });
+      if (!valid) {
+        document.getElementById('err-msg').style.display = 'block';
+        return;
+      }
+      document.getElementById('err-msg').style.display = 'none';
+
+      const orderId = 'MERKLESHOP-' + Date.now().toString(36).toUpperCase();
+      const total = subtotal + shippingCost;
+      const order = {
+        id: orderId,
+        items: Cart.get(),
+        subtotal: subtotal,
+        shipping: shippingCost,
+        total: total,
+        email: document.getElementById('f-email').value,
+        name: document.getElementById('f-fname').value + ' ' + document.getElementById('f-lname').value,
+        date: new Date().toLocaleDateString('it-IT')
+      };
+      localStorage.setItem('merkleshop_last_order', JSON.stringify(order));
+      Cart.clear();
+      window.location.href = 'thankyou.html';
+    }
   </script>
 </body>
 </html>
