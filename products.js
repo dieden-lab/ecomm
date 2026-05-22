@@ -1,0 +1,122 @@
+const PRODUCTS = [
+  {
+    id: 1,
+    name: "Oversized Wool Coat",
+    price: 420,
+    category: "Outerwear",
+    image: "https://picsum.photos/seed/arco1/600/800",
+    description: "Structured silhouette in pure merino wool. Cut wide through the shoulder, tapering to a clean hem. A timeless piece engineered for modern proportions.",
+    material: "100% Merino Wool",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    featured: true,
+    new: false
+  },
+  {
+    id: 2,
+    name: "Ribbed Turtleneck",
+    price: 145,
+    category: "Knitwear",
+    image: "https://picsum.photos/seed/arco2/600/800",
+    description: "Fine-gauge ribbed knit with elongated silhouette. A wardrobe essential refined in cashmere-blend yarn.",
+    material: "70% Wool, 30% Cashmere",
+    sizes: ["XS", "S", "M", "L"],
+    featured: true,
+    new: true
+  },
+  {
+    id: 3,
+    name: "Wide-Leg Trousers",
+    price: 195,
+    category: "Trousers",
+    image: "https://picsum.photos/seed/arco3/600/800",
+    description: "High-rise silhouette with generous leg opening. Crafted in fluid technical fabric that holds its shape.",
+    material: "65% Polyester, 35% Viscose",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    featured: true,
+    new: false
+  },
+  {
+    id: 4,
+    name: "Silk Slip Dress",
+    price: 280,
+    category: "Dresses",
+    image: "https://picsum.photos/seed/arco4/600/800",
+    description: "Bias-cut silk with adjustable straps. Minimal seaming for a clean, uninterrupted drape.",
+    material: "100% Silk",
+    sizes: ["XS", "S", "M", "L"],
+    featured: true,
+    new: true
+  },
+  {
+    id: 5,
+    name: "Leather Belt",
+    price: 85,
+    category: "Accessories",
+    image: "https://picsum.photos/seed/arco5/600/800",
+    description: "Full-grain vegetable-tanned leather. Minimal squared buckle in brushed brass.",
+    material: "Full-grain Leather",
+    sizes: ["S/M", "M/L"],
+    featured: false,
+    new: false
+  },
+  {
+    id: 6,
+    name: "Cashmere Scarf",
+    price: 165,
+    category: "Accessories",
+    image: "https://picsum.photos/seed/arco6/600/800",
+    description: "200×65 cm in two-ply Mongolian cashmere. Blanket-weight softness with controlled fringe.",
+    material: "100% Cashmere",
+    sizes: ["One Size"],
+    featured: false,
+    new: false
+  },
+  {
+    id: 7,
+    name: "Structured Blazer",
+    price: 350,
+    category: "Outerwear",
+    image: "https://picsum.photos/seed/arco7/600/800",
+    description: "Half-canvas construction with padded shoulders. Clean lapel, single button. Works as a jacket or layering piece.",
+    material: "80% Wool, 20% Polyester",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    featured: true,
+    new: false
+  },
+  {
+    id: 8,
+    name: "Denim Jacket",
+    price: 220,
+    category: "Outerwear",
+    image: "https://picsum.photos/seed/arco8/600/800",
+    description: "12oz raw selvedge denim. Boxy cut, minimal hardware, interior seam detailing.",
+    material: "100% Cotton Selvedge Denim",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    featured: false,
+    new: true
+  },
+  {
+    id: 9,
+    name: "Pleated Midi Skirt",
+    price: 175,
+    category: "Skirts",
+    image: "https://picsum.photos/seed/arco9/600/800",
+    description: "Box pleats from hip to hem. Elastic waistband disguised by clean waistband panel. Fluid crêpe fabric.",
+    material: "100% Viscose Crêpe",
+    sizes: ["XS", "S", "M", "L"],
+    featured: false,
+    new: false
+  },
+  {
+    id: 10,
+    name: "Oversized Linen Shirt",
+    price: 130,
+    category: "Tops",
+    image: "https://picsum.photos/seed/arco10/600/800",
+    description: "Garment-washed Belgian linen. Dropped shoulder, curved hem, hidden button placket.",
+    material: "100% Belgian Linen",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    featured: true,
+    new: false
+  }
+];

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collection — ARCO STUDIO</title>
+  <!-- TODO: GTM Head snippet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- TODO: GTM Body noscript -->
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <a href="plp.html" class="active">Collection</a>
+        <a href="plp.html?cat=Outerwear">Outerwear</a>
+        <a href="plp.html?cat=Knitwear">Knitwear</a>
+      </div>
+      <a href="index.html" class="nav-logo">Arco</a>
+      <div class="nav-right">
+        <a href="cart.html" class="cart-btn">
+          <span>Cart</span>
+          <span class="cart-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span id="cart-count"></span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <h1 id="page-title">All Products</h1>
+      <p>Timeless pieces for a considered wardrobe.</p>
+    </div>
+
+    <div class="plp-controls">
+      <div class="filter-tags" id="filter-tags"></div>
+      <span class="plp-count" id="product-count"></span>
+    </div>
+
+    <div class="product-grid cols-4" id="product-grid"></div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Arco</div>
+      <p class="footer-copy">© 2025 Arco Studio. Demo store — no real transactions.</p>
+    </div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    const params = new URLSearchParams(window.location.search);
+    const catParam = params.get('cat');
+
+    // Categories
+    const categories = ['All', ...new Set(PRODUCTS.map(p => p.category))];
+    let activeFilter = catParam || 'All';
+
+    // Render filter tags
+    const filterTags = document.getElementById('filter-tags');
+    filterTags.innerHTML = categories.map(c => `
+      <button class="filter-tag ${c === activeFilter ? 'active' : ''}" 
+              onclick="setFilter('${c}')">${c}</button>
+    `).join('');
+
+    if (catParam) {
+      document.getElementById('page-title').textContent = catParam;
+    }
+
+    function getFiltered() {
+      return activeFilter === 'All' ? PRODUCTS : PRODUCTS.filter(p => p.category === activeFilter);
+    }
+
+    function setFilter(cat) {
+      activeFilter = cat;
+      document.querySelectorAll('.filter-tag').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === cat);
+      });
+      renderGrid();
+      const url = new URL(window.location);
+      cat === 'All' ? url.searchParams.delete('cat') : url.searchParams.set('cat', cat);
+      history.replaceState(null, '', url);
+    }
+
+    function renderGrid() {
+      const filtered = getFiltered();
+      const grid = document.getElementById('product-grid');
+      document.getElementById('product-count').textContent = `${filtered.length} prodotti`;
+
+      // DL: view_item_list
+      dataLayer.push({ ecommerce: null });
+      dataLayer.push({
+        event: 'view_item_list',
+        ecommerce: {
+          item_list_id: activeFilter.toLowerCase().replace(' ', '_'),
+          item_list_name: activeFilter,
+          items: filtered.map((p, i) => ({
+            item_id: String(p.id),
+            item_name: p.name,
+            item_category: p.category,
+            price: p.price,
+            index: i
+          }))
+        }
+      });
+
+      grid.innerHTML = filtered.map((p, i) => `
+        <div class="product-card" onclick="selectProduct(${p.id}, ${i})">
+          ${p.new ? '<span class="product-badge">New</span>' : ''}
+          <div class="product-img">
+            <img src="${p.image}" alt="${p.name}" loading="lazy">
+          </div>
+          <div class="product-info">
+            <p class="product-category">${p.category}</p>
+            <p class="product-name">${p.name}</p>
+            <p class="product-price">${formatPrice(p.price)}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function selectProduct(id, index) {
+      const product = PRODUCTS.find(p => p.id === id);
+      dataLayer.push({ ecommerce: null });
+      dataLayer.push({
+        event: 'select_item',
+        ecommerce: {
+          item_list_id: activeFilter.toLowerCase().replace(' ', '_'),
+          item_list_name: activeFilter,
+          items: [{
+            item_id: String(product.id),
+            item_name: product.name,
+            item_category: product.category,
+            price: product.price,
+            index: index
+          }]
+        }
+      });
+      window.location.href = `pdp.html?id=${id}`;
+    }
+
+    renderGrid();
+  </script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARCO STUDIO — Contemporary Fashion</title>
+  <!-- TODO: GTM Head snippet -->
+  <!-- <script>(function(w,d,s,l,i){...})(window,document,'script','dataLayer','GTM-XXXXXXX');</script> -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- TODO: GTM Body noscript -->
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <a href="plp.html">Collection</a>
+        <a href="plp.html?cat=Outerwear">Outerwear</a>
+        <a href="plp.html?cat=Knitwear">Knitwear</a>
+      </div>
+      <a href="index.html" class="nav-logo">Arco</a>
+      <div class="nav-right">
+        <a href="cart.html" class="cart-btn">
+          <span>Cart</span>
+          <span class="cart-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span id="cart-count"></span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <p class="hero-eyebrow">New Collection — SS 2025</p>
+      <h1>Wear<br><em>less,</em><br>carry more.</h1>
+      <p class="hero-sub">Essential pieces built for longevity. No fast fashion, no noise — just form and function distilled.</p>
+      <a href="plp.html" class="btn-primary">
+        Explore the Collection
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="container">
+      <div class="section-header">
+        <h2 class="section-title">Featured</h2>
+        <a href="plp.html" class="section-link">View All →</a>
+      </div>
+      <div class="product-grid" id="featured-grid"></div>
+    </section>
+
+    <!-- Editorial Banner -->
+    <section style="background: var(--cream); margin-top: 2px; padding: 80px 32px; text-align:center;">
+      <p style="font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--accent);margin-bottom:16px">Our Philosophy</p>
+      <h2 style="font-family:var(--font-display);font-size:clamp(28px,4vw,48px);font-weight:300;max-width:700px;margin:0 auto 20px;line-height:1.2;letter-spacing:-0.01em">
+        Fewer, better things.<br><em>Made to outlast the season.</em>
+      </h2>
+      <p style="font-size:13px;color:var(--mid);max-width:420px;margin:0 auto">Responsibly sourced materials. Timeless cuts. No collections, no drops — just pieces that work.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Arco</div>
+      <p class="footer-copy">© 2025 Arco Studio. Demo store — no real transactions.</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    // DL: page_view handled by GA4 natively
+
+    const featured = PRODUCTS.filter(p => p.featured).slice(0, 6);
+    const grid = document.getElementById('featured-grid');
+
+    // DL: view_item_list
+    window.dataLayer = window.dataLayer || [];
+    dataLayer.push({ ecommerce: null });
+    dataLayer.push({
+      event: 'view_item_list',
+      ecommerce: {
+        item_list_id: 'featured',
+        item_list_name: 'Featured',
+        items: featured.map((p, i) => ({
+          item_id: String(p.id),
+          item_name: p.name,
+          item_category: p.category,
+          price: p.price,
+          index: i
+        }))
+      }
+    });
+
+    grid.innerHTML = featured.map((p, i) => `
+      <div class="product-card" onclick="selectProduct(${p.id}, ${i})">
+        ${p.new ? '<span class="product-badge">New</span>' : ''}
+        <div class="product-img">
+          <img src="${p.image}" alt="${p.name}" loading="lazy">
+        </div>
+        <div class="product-info">
+          <p class="product-category">${p.category}</p>
+          <p class="product-name">${p.name}</p>
+          <p class="product-price">${formatPrice(p.price)}</p>
+        </div>
+      </div>
+    `).join('');
+
+    function selectProduct(id, index) {
+      const product = PRODUCTS.find(p => p.id === id);
+      dataLayer.push({ ecommerce: null });
+      dataLayer.push({
+        event: 'select_item',
+        ecommerce: {
+          item_list_id: 'featured',
+          item_list_name: 'Featured',
+          items: [{
+            item_id: String(product.id),
+            item_name: product.name,
+            item_category: product.category,
+            price: product.price,
+            index: index
+          }]
+        }
+      });
+      window.location.href = `pdp.html?id=${id}`;
+    }
+  </script>
+</body>
+</html>

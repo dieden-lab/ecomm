@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed — ARCO STUDIO</title>
+  <!-- TODO: GTM Head snippet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- TODO: GTM Body noscript -->
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-left"></div>
+      <a href="index.html" class="nav-logo">Arco</a>
+      <div class="nav-right">
+        <a href="cart.html" class="cart-btn">
+          <span>Cart</span>
+          <span class="cart-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span id="cart-count"></span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="thankyou-wrap">
+      <div class="ty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+
+      <h1 class="ty-title">Thank<br><em>You.</em></h1>
+      <p class="ty-sub" id="ty-sub">
+        Your order has been confirmed. We'll send a confirmation to your email shortly.
+      </p>
+
+      <div class="order-summary-box" id="order-box">
+        <!-- Filled by JS -->
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="index.html" class="btn-primary">Back to Home</a>
+        <a href="plp.html" class="btn-secondary">Continue Shopping</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Arco</div>
+      <p class="footer-copy">© 2025 Arco Studio. Demo store — no real transactions.</p>
+    </div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    const orderRaw = localStorage.getItem('arco_last_order');
+    const order = orderRaw ? JSON.parse(orderRaw) : null;
+
+    if (!order) {
+      // No order data — show generic confirmation
+      document.getElementById('order-box').innerHTML = `
+        <p style="text-align:center;font-size:13px;color:var(--mid)">
+          Order details not available. Please check your email for confirmation.
+        </p>
+      `;
+    } else {
+      // Update sub text with email
+      document.getElementById('ty-sub').textContent =
+        `Your order has been confirmed. We'll send a confirmation to ${order.email} shortly.`;
+
+      // Render order box
+      const itemsHTML = order.items.map(item => {
+        const p = PRODUCTS.find(p => p.id === item.productId);
+        if (!p) return '';
+        return `
+          <div class="ty-item">
+            <span class="name">${p.name} <span style="color:var(--mid);font-weight:300">×${item.quantity}</span></span>
+            <span>${formatPrice(p.price * item.quantity)}</span>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('order-box').innerHTML = `
+        <div class="order-ref">
+          Order <span>${order.id}</span> · <span>${order.date}</span>
+        </div>
+        ${itemsHTML}
+        <div class="ty-item" style="margin-top:8px">
+          <span>Shipping</span>
+          <span>${order.shipping === 0 ? 'Free' : formatPrice(order.shipping)}</span>
+        </div>
+        <div class="ty-item" style="font-weight:400;font-size:15px;border-bottom:none;padding-top:12px">
+          <span>Total</span>
+          <span style="font-family:var(--font-display);font-size:20px">${formatPrice(order.total)}</span>
+        </div>
+      `;
+
+      // DL: purchase (backup push — in case GTM fired before this page loaded)
+      // Primary purchase event is pushed from checkout.html before redirect
+      // This is a redundant push guarded by a session flag to avoid double-counting in GTM
+      // Configure GTM trigger: event='purchase' AND custom dimension 'purchase_fired' does not exist
+      const purchaseFired = sessionStorage.getItem('purchase_dl_fired');
+      if (!purchaseFired) {
+        sessionStorage.setItem('purchase_dl_fired', '1');
+        dataLayer.push({ ecommerce: null });
+        dataLayer.push({
+          event: 'purchase',
+          ecommerce: {
+            transaction_id: order.id,
+            value: order.total,
+            tax: parseFloat((order.total * 0.22).toFixed(2)),
+            shipping: order.shipping,
+            currency: 'EUR',
+            items: order.items.map(item => {
+              const p = PRODUCTS.find(p => p.id === item.productId);
+              return {
+                item_id: String(p.id),
+                item_name: p.name,
+                item_category: p.category,
+                price: p.price,
+                quantity: item.quantity
+              };
+            })
+          }
+        });
+      }
+
+      // Clean up order from storage after rendering
+      // (Uncomment in production to prevent re-render on refresh)
+      // localStorage.removeItem('arco_last_order');
+    }
+  </script>
+</body>
+</html>

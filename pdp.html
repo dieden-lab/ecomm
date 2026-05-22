@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Product — ARCO STUDIO</title>
+  <!-- TODO: GTM Head snippet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- TODO: GTM Body noscript -->
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <a href="plp.html">Collection</a>
+        <a href="plp.html?cat=Outerwear">Outerwear</a>
+        <a href="plp.html?cat=Knitwear">Knitwear</a>
+      </div>
+      <a href="index.html" class="nav-logo">Arco</a>
+      <div class="nav-right">
+        <a href="cart.html" class="cart-btn">
+          <span>Cart</span>
+          <span class="cart-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span id="cart-count"></span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Breadcrumb -->
+  <div class="container" style="padding-top:20px;padding-bottom:4px;">
+    <a href="plp.html" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);">
+      ← Collection
+    </a>
+  </div>
+
+  <main class="container" id="pdp-content">
+    <!-- Filled by JS -->
+  </main>
+
+  <!-- Related Products -->
+  <section class="container" style="border-top:1px solid var(--border);padding-top:48px;margin-bottom:80px;">
+    <div class="section-header" style="padding-top:0">
+      <h2 class="section-title">You may also like</h2>
+    </div>
+    <div class="product-grid" id="related-grid"></div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Arco</div>
+      <p class="footer-copy">© 2025 Arco Studio. Demo store — no real transactions.</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    const params = new URLSearchParams(window.location.search);
+    const productId = parseInt(params.get('id'));
+    const product = PRODUCTS.find(p => p.id === productId);
+
+    if (!product) {
+      window.location.href = 'plp.html';
+    }
+
+    // Update page title
+    document.getElementById('page-title').textContent = `${product.name} — ARCO STUDIO`;
+
+    // DL: view_item
+    dataLayer.push({ ecommerce: null });
+    dataLayer.push({
+      event: 'view_item',
+      ecommerce: {
+        currency: 'EUR',
+        value: product.price,
+        items: [{
+          item_id: String(product.id),
+          item_name: product.name,
+          item_category: product.category,
+          price: product.price,
+          quantity: 1
+        }]
+      }
+    });
+
+    // Render PDP
+    let selectedSize = null;
+
+    document.getElementById('pdp-content').innerHTML = `
+      <div class="pdp-layout">
+        <div class="pdp-images">
+          <div class="main-image">
+            <img src="${product.image}" alt="${product.name}">
+          </div>
+        </div>
+        <div class="pdp-sticky">
+          <p class="pdp-eyebrow">${product.category}</p>
+          <h1 class="pdp-title">${product.name}</h1>
+          <p class="pdp-price">${formatPrice(product.price)}</p>
+          <p class="pdp-desc">${product.description}</p>
+
+          <p class="size-label">Size ${product.sizes.length === 1 ? '' : '<span style="color:var(--mid);font-weight:300">— Select one</span>'}</p>
+          <div class="size-grid" id="size-grid">
+            ${product.sizes.map(s => `
+              <button class="size-btn" onclick="selectSize('${s}')">${s}</button>
+            `).join('')}
+          </div>
+
+          <button class="btn-add-cart" id="add-btn" onclick="handleAddToCart()" disabled>
+            Add to Cart
+          </button>
+          <button class="btn-secondary" style="width:100%" onclick="window.location.href='cart.html'">
+            View Cart
+          </button>
+
+          <div class="pdp-meta">
+            <div>Material <span>${product.material}</span></div>
+            <div>Delivery <span>3–5 working days</span></div>
+            <div>Returns <span>Free within 30 days</span></div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Auto-select if only one size
+    if (product.sizes.length === 1) {
+      selectSize(product.sizes[0]);
+    }
+
+    function selectSize(size) {
+      selectedSize = size;
+      document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === size);
+      });
+      document.getElementById('add-btn').disabled = false;
+    }
+
+    function handleAddToCart() {
+      if (!selectedSize) return;
+      Cart.add(product.id, selectedSize, 1);
+
+      const toast = document.getElementById('toast');
+      toast.textContent = `${product.name} added to cart`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Related products (same category, excluding current)
+    const related = PRODUCTS
+      .filter(p => p.category === product.category && p.id !== product.id)
+      .concat(PRODUCTS.filter(p => p.category !== product.category && p.id !== product.id))
+      .slice(0, 3);
+
+    document.getElementById('related-grid').innerHTML = related.map(p => `
+      <div class="product-card" onclick="window.location.href='pdp.html?id=${p.id}'">
+        ${p.new ? '<span class="product-badge">New</span>' : ''}
+        <div class="product-img">
+          <img src="${p.image}" alt="${p.name}" loading="lazy">
+        </div>
+        <div class="product-info">
+          <p class="product-category">${p.category}</p>
+          <p class="product-name">${p.name}</p>
+          <p class="product-price">${formatPrice(p.price)}</p>
+        </div>
+      </div>
+    `).join('');
+  </script>
+</body>
+</html>

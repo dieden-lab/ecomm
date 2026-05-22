@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — ARCO STUDIO</title>
+  <!-- TODO: GTM Head snippet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- TODO: GTM Body noscript -->
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <a href="cart.html" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid)">
+          ← Back to Cart
+        </a>
+      </div>
+      <a href="index.html" class="nav-logo">Arco</a>
+      <div class="nav-right">
+        <span style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid)">
+          Secure Checkout
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Checkout</h1>
+    </div>
+    <div class="checkout-layout">
+      <!-- Left: Form -->
+      <div>
+        <!-- Contact -->
+        <div class="checkout-section">
+          <h2 class="checkout-section-title">Contact</h2>
+          <div class="form-grid full">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" placeholder="your@email.com" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping -->
+        <div class="checkout-section">
+          <h2 class="checkout-section-title">Shipping Address</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" id="fname" placeholder="Mario" required>
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" id="lname" placeholder="Rossi" required>
+            </div>
+            <div class="form-group span-2">
+              <label>Address</label>
+              <input type="text" id="address" placeholder="Via Roma, 1" required>
+            </div>
+            <div class="form-group">
+              <label>City</label>
+              <input type="text" id="city" placeholder="Milano" required>
+            </div>
+            <div class="form-group">
+              <label>Postal Code</label>
+              <input type="text" id="zip" placeholder="20121" required>
+            </div>
+            <div class="form-group span-2">
+              <label>Country</label>
+              <select id="country">
+                <option value="IT">Italy</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="UK">United Kingdom</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping method -->
+        <div class="checkout-section">
+          <h2 class="checkout-section-title">Shipping Method</h2>
+          <div style="display:flex;flex-direction:column;gap:10px" id="shipping-options">
+            <label style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--charcoal);padding:16px;border-radius:var(--radius);cursor:pointer">
+              <div style="display:flex;align-items:center;gap:12px">
+                <input type="radio" name="shipping" value="standard" checked style="accent-color:var(--charcoal)">
+                <div>
+                  <p style="font-size:14px;font-weight:400">Standard Delivery</p>
+                  <p style="font-size:12px;color:var(--mid)">3–5 working days</p>
+                </div>
+              </div>
+              <span id="shipping-std-price" style="font-family:var(--font-display);font-size:16px">Free</span>
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);padding:16px;border-radius:var(--radius);cursor:pointer">
+              <div style="display:flex;align-items:center;gap:12px">
+                <input type="radio" name="shipping" value="express" style="accent-color:var(--charcoal)">
+                <div>
+                  <p style="font-size:14px;font-weight:400">Express Delivery</p>
+                  <p style="font-size:12px;color:var(--mid)">1–2 working days</p>
+                </div>
+              </div>
+              <span style="font-family:var(--font-display);font-size:16px">€18</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="checkout-section">
+          <h2 class="checkout-section-title">Payment</h2>
+          <div style="background:var(--cream);border:1px dashed var(--border);padding:20px;border-radius:var(--radius);margin-bottom:16px">
+            <p style="font-size:12px;color:var(--mid);text-align:center;letter-spacing:0.05em">
+              🔒 Demo store — payment fields are decorative only
+            </p>
+          </div>
+          <div class="form-grid">
+            <div class="form-group span-2">
+              <label>Card Number</label>
+              <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" id="card-num">
+            </div>
+            <div class="form-group">
+              <label>Expiry</label>
+              <input type="text" placeholder="MM / YY" maxlength="7" id="card-exp">
+            </div>
+            <div class="form-group">
+              <label>CVV</label>
+              <input type="text" placeholder="123" maxlength="4" id="card-cvv">
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-primary" style="width:100%;justify-content:center;padding:18px" onclick="placeOrder()">
+          Place Order
+        </button>
+        <p style="font-size:11px;color:var(--mid);text-align:center;margin-top:12px;line-height:1.6">
+          By placing your order you agree to our Terms of Service and Privacy Policy.
+        </p>
+      </div>
+
+      <!-- Right: Order Summary -->
+      <div class="cart-summary" id="order-summary" style="top: calc(var(--nav-h) + 24px)">
+        <h2 class="summary-title">Your Order</h2>
+        <div id="summary-items"></div>
+        <div id="summary-totals"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Arco</div>
+      <p class="footer-copy">© 2025 Arco Studio. Demo store — no real transactions.</p>
+    </div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    const items = Cart.get();
+    if (items.length === 0) window.location.href = 'cart.html';
+
+    const subtotal = Cart.total();
+    const stdShipping = subtotal >= 200 ? 0 : 12;
+    let shippingCost = stdShipping;
+
+    // Update standard shipping display
+    document.getElementById('shipping-std-price').textContent = stdShipping === 0 ? 'Free' : `€${stdShipping}`;
+
+    // Render summary items
+    document.getElementById('summary-items').innerHTML = items.map(item => {
+      const p = PRODUCTS.find(p => p.id === item.productId);
+      return `
+        <div style="display:flex;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="width:60px;flex-shrink:0;aspect-ratio:3/4;background:var(--border);border-radius:var(--radius);overflow:hidden">
+            <img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">
+          </div>
+          <div style="flex:1">
+            <p style="font-size:13px;font-weight:400;margin-bottom:2px">${p.name}</p>
+            <p style="font-size:11px;color:var(--mid)">Size ${item.size} · Qty ${item.quantity}</p>
+          </div>
+          <p style="font-family:var(--font-display);font-size:16px;white-space:nowrap">${formatPrice(p.price * item.quantity)}</p>
+        </div>
+      `;
+    }).join('');
+
+    function updateTotals() {
+      const total = subtotal + shippingCost;
+      document.getElementById('summary-totals').innerHTML = `
+        <div class="summary-row"><span>Subtotal</span><span>${formatPrice(subtotal)}</span></div>
+        <div class="summary-row"><span>Shipping</span><span>${shippingCost === 0 ? 'Free' : formatPrice(shippingCost)}</span></div>
+        <div class="summary-row total"><span>Total</span><span class="amount">${formatPrice(total)}</span></div>
+      `;
+    }
+
+    // Shipping radio change
+    document.querySelectorAll('input[name="shipping"]').forEach(radio => {
+      radio.addEventListener('change', e => {
+        shippingCost = e.target.value === 'express' ? 18 : stdShipping;
+        document.querySelectorAll('[name="shipping"]').forEach(r => {
+          r.closest('label').style.borderColor = r.checked ? 'var(--charcoal)' : 'var(--border)';
+        });
+        updateTotals();
+
+        // DL: add_shipping_info
+        dataLayer.push({ ecommerce: null });
+        dataLayer.push({
+          event: 'add_shipping_info',
+          ecommerce: {
+            currency: 'EUR',
+            value: Cart.total() + shippingCost,
+            shipping_tier: e.target.value,
+            items: Cart.getItemsForDL()
+          }
+        });
+      });
+    });
+
+    function placeOrder() {
+      // Basic validation
+      const required = ['email', 'fname', 'lname', 'address', 'city', 'zip'];
+      const missing = required.filter(id => !document.getElementById(id).value.trim());
+      if (missing.length) {
+        missing.forEach(id => document.getElementById(id).style.borderColor = 'var(--accent)');
+        return;
+      }
+
+      const orderId = 'ARCO-' + Date.now().toString(36).toUpperCase();
+      const total = subtotal + shippingCost;
+
+      // DL: purchase
+      dataLayer.push({ ecommerce: null });
+      dataLayer.push({
+        event: 'purchase',
+        ecommerce: {
+          transaction_id: orderId,
+          value: total,
+          tax: (total * 0.22).toFixed(2),
+          shipping: shippingCost,
+          currency: 'EUR',
+          items: Cart.getItemsForDL()
+        }
+      });
+
+      // Save order to localStorage for thank-you page
+      const order = {
+        id: orderId,
+        items: Cart.get(),
+        subtotal,
+        shipping: shippingCost,
+        total,
+        email: document.getElementById('email').value,
+        name: `${document.getElementById('fname').value} ${document.getElementById('lname').value}`,
+        date: new Date().toLocaleDateString('it-IT')
+      };
+      localStorage.setItem('arco_last_order', JSON.stringify(order));
+
+      Cart.clear();
+      window.location.href = 'thankyou.html';
+    }
+
+    updateTotals();
+
+    // Card number formatting
+    document.getElementById('card-num').addEventListener('input', e => {
+      let v = e.target.value.replace(/\D/g, '').substring(0, 16);
+      e.target.value = v.replace(/(.{4})/g, '$1 ').trim();
+    });
+
+    document.getElementById('card-exp').addEventListener('input', e => {
+      let v = e.target.value.replace(/\D/g, '').substring(0, 4);
+      if (v.length >= 2) v = v.substring(0, 2) + ' / ' + v.substring(2);
+      e.target.value = v;
+    });
+  </script>
+</body>
+</html>
