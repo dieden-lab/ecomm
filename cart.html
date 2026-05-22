@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cart — MerkleShop</title>
-  <!-- TODO: GTM Head snippet -->
+  <!-- GTM HEAD: (function(w,d,s,l,i){...})(window,document,'script','dataLayer','GTM-XXXXXXX'); -->
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
 
@@ -338,15 +338,17 @@ input, select, textarea { font-family: var(--font-body); }
   .container { padding: 0 20px; }
 }
 
-</style>
+  </style>
+  
 </head>
 <body>
-  <!-- TODO: GTM Body noscript -->
+  <!-- GTM BODY: <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"...></noscript> -->
 
   <nav class="nav">
     <div class="nav-inner">
+      
       <div class="nav-left">
-        <a href="plp.html">Collection</a>
+        <a href="plp.html" >Collection</a>
         <a href="plp.html?cat=Outerwear">Outerwear</a>
         <a href="plp.html?cat=Knitwear">Knitwear</a>
       </div>
@@ -363,22 +365,15 @@ input, select, textarea { font-family: var(--font-body); }
     </div>
   </nav>
 
+  
   <main class="container">
-    <div class="page-header">
-      <h1>Your Cart</h1>
-    </div>
+    <div class="page-header"><h1>Your Cart</h1></div>
     <div id="cart-content"></div>
   </main>
+  <footer class="footer"><div class="footer-inner"><div class="footer-logo">Merkle<span>Shop</span></div><p class="footer-copy">© 2025 MerkleShop. Demo store.</p></div></footer>
+  <div id="toast" class="toast"></div>
 
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-logo">Merkle<span>Shop</span></div>
-      <p class="footer-copy">© 2025 MerkleShop. Demo store — no real transactions.</p>
-    </div>
-  </footer>
-
-  <script>
-const PRODUCTS = [
+  <script>const PRODUCTS = [
   {
     id: 1,
     name: "Oversized Wool Coat",
@@ -500,10 +495,8 @@ const PRODUCTS = [
     new: false
   }
 ];
-
 </script>
-  <script>
-const CART_KEY = 'merkleshop_cart';
+  <script>const CART_KEY = 'merkleshop_cart';
 window.dataLayer = window.dataLayer || [];
 
 const Cart = {
@@ -631,104 +624,66 @@ function formatPrice(n) {
 document.addEventListener('DOMContentLoaded', () => {
   Cart.updateBadge();
 });
-
 </script>
   <script>
+
     window.dataLayer = window.dataLayer || [];
 
     function renderCart() {
       const items = Cart.get();
-      const content = document.getElementById('cart-content');
-
+      const el = document.getElementById('cart-content');
       if (items.length === 0) {
-        content.innerHTML = `
-          <div class="empty-cart">
-            <h2>Your cart is empty</h2>
-            <p>Add something beautiful to get started.</p>
-            <a href="plp.html" class="btn-primary" style="display:inline-flex">Explore Collection</a>
-          </div>`;
+        el.innerHTML = '<div class="empty-cart"><h2>Your cart is empty</h2><p>Add something to get started.</p><a href="plp.html" class="btn-primary" style="display:inline-flex">Explore Collection</a></div>';
         return;
       }
-
       const subtotal = Cart.total();
       const shipping = subtotal >= 200 ? 0 : 12;
       const total = subtotal + shipping;
-
       dataLayer.push({ ecommerce: null });
-      dataLayer.push({
-        event: 'view_cart',
-        ecommerce: { currency: 'EUR', value: total, items: Cart.getItemsForDL() }
-      });
-
-      content.innerHTML = `
+      dataLayer.push({ event: 'view_cart', ecommerce: { currency: 'EUR', value: total, items: Cart.getItemsForDL() } });
+      el.innerHTML = `
         <div class="cart-layout">
           <div class="cart-items">
             ${items.map((item, i) => {
               const p = PRODUCTS.find(p => p.id === item.productId);
               if (!p) return '';
-              return `
-                <div class="cart-item">
-                  <a href="pdp.html?id=${p.id}">
-                    <div class="cart-item-img">
-                      <img src="${p.image}" alt="${p.name}">
-                    </div>
-                  </a>
-                  <div>
-                    <p class="cart-item-name">${p.name}</p>
-                    <p class="cart-item-meta">Size: ${item.size} · ${p.category}</p>
-                    <div class="qty-control">
-                      <button class="qty-btn" onclick="changeQty(${i}, ${item.quantity - 1})">−</button>
-                      <span class="qty-val">${item.quantity}</span>
-                      <button class="qty-btn" onclick="changeQty(${i}, ${item.quantity + 1})">+</button>
-                    </div>
-                    <button class="remove-btn" onclick="removeItem(${i})">Remove</button>
+              return `<div class="cart-item">
+                <a href="pdp.html?id=${p.id}"><div class="cart-item-img"><img src="${p.image}" alt="${p.name}"></div></a>
+                <div>
+                  <p class="cart-item-name">${p.name}</p>
+                  <p class="cart-item-meta">Size: ${item.size} · ${p.category}</p>
+                  <div class="qty-control">
+                    <button class="qty-btn" onclick="changeQty(${i},${item.quantity-1})">−</button>
+                    <span class="qty-val">${item.quantity}</span>
+                    <button class="qty-btn" onclick="changeQty(${i},${item.quantity+1})">+</button>
                   </div>
-                  <div style="text-align:right">
-                    <p class="cart-item-price">${formatPrice(p.price * item.quantity)}</p>
-                    <p style="font-size:12px;color:var(--mid);margin-top:4px">${formatPrice(p.price)} each</p>
-                  </div>
-                </div>`;
+                  <button class="remove-btn" onclick="removeItem(${i})">Remove</button>
+                </div>
+                <div style="text-align:right">
+                  <p class="cart-item-price">${formatPrice(p.price * item.quantity)}</p>
+                  <p style="font-size:12px;color:var(--mid);margin-top:4px">${formatPrice(p.price)} each</p>
+                </div>
+              </div>`;
             }).join('')}
           </div>
-
           <div class="cart-summary">
             <h2 class="summary-title">Order Summary</h2>
             <div class="summary-row"><span>Subtotal</span><span>${formatPrice(subtotal)}</span></div>
             <div class="summary-row"><span>Shipping</span><span>${shipping === 0 ? 'Free' : formatPrice(shipping)}</span></div>
-            ${shipping > 0 ? `<p style="font-size:11px;color:var(--accent);margin-bottom:12px">Add ${formatPrice(200 - subtotal)} for free shipping</p>` : ''}
-            <div class="summary-row total">
-              <span>Total</span>
-              <span class="amount">${formatPrice(total)}</span>
-            </div>
-            <button class="btn-primary" style="width:100%;justify-content:center;margin-top:20px" onclick="goToCheckout()">
-              Proceed to Checkout
-            </button>
-            <a href="plp.html" class="btn-secondary" style="width:100%;justify-content:center;margin-top:8px;display:flex">
-              Continue Shopping
-            </a>
+            ${shipping > 0 ? `<p style="font-size:11px;color:var(--red);margin-bottom:10px">Add ${formatPrice(200-subtotal)} for free shipping</p>` : ''}
+            <div class="summary-row total"><span>Total</span><span class="amount">${formatPrice(total)}</span></div>
+            <button class="btn-primary" style="width:100%;justify-content:center;margin-top:18px" onclick="goCheckout()">Proceed to Checkout</button>
+            <a href="plp.html" class="btn-secondary" style="width:100%;justify-content:center;margin-top:8px;display:flex">Continue Shopping</a>
           </div>
         </div>`;
     }
-
-    function changeQty(index, qty) {
-      Cart.updateQuantity(index, qty);
-      renderCart();
-    }
-
-    function removeItem(index) {
-      Cart.remove(index);
-      renderCart();
-    }
-
-    function goToCheckout() {
+    function changeQty(i, qty) { Cart.updateQuantity(i, qty); renderCart(); }
+    function removeItem(i) { Cart.remove(i); renderCart(); }
+    function goCheckout() {
       dataLayer.push({ ecommerce: null });
-      dataLayer.push({
-        event: 'begin_checkout',
-        ecommerce: { currency: 'EUR', value: Cart.total(), items: Cart.getItemsForDL() }
-      });
+      dataLayer.push({ event: 'begin_checkout', ecommerce: { currency: 'EUR', value: Cart.total(), items: Cart.getItemsForDL() } });
       window.location.href = 'checkout.html';
     }
-
     renderCart();
   </script>
 </body>
