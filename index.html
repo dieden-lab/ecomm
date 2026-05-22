@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MerkleShop — Contemporary Fashion</title>
-  <!-- TODO: GTM Head snippet -->
+  <title>MerkleShop — MerkleShop</title>
+  <!-- GTM HEAD: (function(w,d,s,l,i){...})(window,document,'script','dataLayer','GTM-XXXXXXX'); -->
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
 
@@ -338,15 +338,17 @@ input, select, textarea { font-family: var(--font-body); }
   .container { padding: 0 20px; }
 }
 
-</style>
+  </style>
+  
 </head>
 <body>
-  <!-- TODO: GTM Body noscript -->
+  <!-- GTM BODY: <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"...></noscript> -->
 
   <nav class="nav">
     <div class="nav-inner">
+      
       <div class="nav-left">
-        <a href="plp.html">Collection</a>
+        <a href="plp.html" class='active'>Collection</a>
         <a href="plp.html?cat=Outerwear">Outerwear</a>
         <a href="plp.html?cat=Knitwear">Knitwear</a>
       </div>
@@ -363,17 +365,17 @@ input, select, textarea { font-family: var(--font-body); }
     </div>
   </nav>
 
+  
   <main>
     <section class="hero">
       <p class="hero-eyebrow">New Collection — SS 2025</p>
-      <h1>Wear<br><em>less,</em><br>carry more.</h1>
-      <p class="hero-sub">Essential pieces built for longevity. No fast fashion, no noise — just form and function distilled.</p>
+      <h1>Shop<br><em>smarter,</em><br>buy better.</h1>
+      <p class="hero-sub">Curated essentials built for longevity. Quality over quantity, always.</p>
       <a href="plp.html" class="btn-primary">
-        Explore the Collection
+        Explore Collection
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
     </section>
-
     <section class="container">
       <div class="section-header">
         <h2 class="section-title">Featured</h2>
@@ -381,27 +383,22 @@ input, select, textarea { font-family: var(--font-body); }
       </div>
       <div class="product-grid" id="featured-grid"></div>
     </section>
-
-    <section style="background:var(--cream);margin-top:2px;padding:80px 32px;text-align:center;">
-      <p style="font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--accent);margin-bottom:16px">Our Philosophy</p>
-      <h2 style="font-family:var(--font-display);font-size:clamp(28px,4vw,48px);font-weight:300;max-width:700px;margin:0 auto 20px;line-height:1.2;letter-spacing:-0.01em">
-        Fewer, better things.<br><em>Made to outlast the season.</em>
+    <section style="background:var(--blue-dark);padding:72px 32px;text-align:center;margin-top:40px">
+      <p style="font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--red);margin-bottom:14px;font-weight:600">Our Promise</p>
+      <h2 style="font-family:var(--font-display);font-size:clamp(26px,3.5vw,42px);font-weight:700;color:white;max-width:640px;margin:0 auto 16px;letter-spacing:-0.01em">
+        Quality pieces, fair prices,<br>zero compromises.
       </h2>
-      <p style="font-size:13px;color:var(--mid);max-width:420px;margin:0 auto">Responsibly sourced materials. Timeless cuts. No collections, no drops — just pieces that work.</p>
     </section>
   </main>
-
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-logo">Merkle<span>Shop</span></div>
       <p class="footer-copy">© 2025 MerkleShop. Demo store — no real transactions.</p>
     </div>
   </footer>
-
   <div id="toast" class="toast"></div>
 
-  <script>
-const PRODUCTS = [
+  <script>const PRODUCTS = [
   {
     id: 1,
     name: "Oversized Wool Coat",
@@ -523,10 +520,8 @@ const PRODUCTS = [
     new: false
   }
 ];
-
 </script>
-  <script>
-const CART_KEY = 'merkleshop_cart';
+  <script>const CART_KEY = 'merkleshop_cart';
 window.dataLayer = window.dataLayer || [];
 
 const Cart = {
@@ -654,56 +649,34 @@ function formatPrice(n) {
 document.addEventListener('DOMContentLoaded', () => {
   Cart.updateBadge();
 });
-
 </script>
   <script>
+
     window.dataLayer = window.dataLayer || [];
-
     const featured = PRODUCTS.filter(p => p.featured).slice(0, 6);
-    const grid = document.getElementById('featured-grid');
-
     dataLayer.push({ ecommerce: null });
     dataLayer.push({
       event: 'view_item_list',
       ecommerce: {
-        item_list_id: 'featured',
-        item_list_name: 'Featured',
-        items: featured.map((p, i) => ({
-          item_id: String(p.id),
-          item_name: p.name,
-          item_category: p.category,
-          price: p.price,
-          index: i
-        }))
+        item_list_id: 'featured', item_list_name: 'Featured',
+        items: featured.map((p, i) => ({ item_id: String(p.id), item_name: p.name, item_category: p.category, price: p.price, index: i }))
       }
     });
-
-    grid.innerHTML = featured.map((p, i) => `
-      <div class="product-card" onclick="selectProduct(${p.id}, ${i})">
+    document.getElementById('featured-grid').innerHTML = featured.map((p, i) => `
+      <div class="product-card" onclick="goProduct(${p.id},${i},'featured','Featured')">
         ${p.new ? '<span class="product-badge">New</span>' : ''}
-        <div class="product-img">
-          <img src="${p.image}" alt="${p.name}" loading="lazy">
-        </div>
+        <div class="product-img"><img src="${p.image}" alt="${p.name}" loading="lazy"></div>
         <div class="product-info">
           <p class="product-category">${p.category}</p>
           <p class="product-name">${p.name}</p>
           <p class="product-price">${formatPrice(p.price)}</p>
         </div>
-      </div>
-    `).join('');
-
-    function selectProduct(id, index) {
-      const product = PRODUCTS.find(p => p.id === id);
+      </div>`).join('');
+    function goProduct(id, index, listId, listName) {
+      const p = PRODUCTS.find(p => p.id === id);
       dataLayer.push({ ecommerce: null });
-      dataLayer.push({
-        event: 'select_item',
-        ecommerce: {
-          item_list_id: 'featured',
-          item_list_name: 'Featured',
-          items: [{ item_id: String(product.id), item_name: product.name, item_category: product.category, price: product.price, index: index }]
-        }
-      });
-      window.location.href = `pdp.html?id=${id}`;
+      dataLayer.push({ event: 'select_item', ecommerce: { item_list_id: listId, item_list_name: listName, items: [{ item_id: String(p.id), item_name: p.name, item_category: p.category, price: p.price, index }] } });
+      window.location.href = 'pdp.html?id=' + id;
     }
   </script>
 </body>
