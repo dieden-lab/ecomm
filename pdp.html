@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page-title">Product — MerkleShop</title>
-  <!-- TODO: GTM Head snippet -->
+  <title>Product — MerkleShop</title>
+  <!-- GTM HEAD: (function(w,d,s,l,i){...})(window,document,'script','dataLayer','GTM-XXXXXXX'); -->
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
 
@@ -338,15 +338,17 @@ input, select, textarea { font-family: var(--font-body); }
   .container { padding: 0 20px; }
 }
 
-</style>
+  </style>
+  
 </head>
 <body>
-  <!-- TODO: GTM Body noscript -->
+  <!-- GTM BODY: <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"...></noscript> -->
 
   <nav class="nav">
     <div class="nav-inner">
+      
       <div class="nav-left">
-        <a href="plp.html">Collection</a>
+        <a href="plp.html" >Collection</a>
         <a href="plp.html?cat=Outerwear">Outerwear</a>
         <a href="plp.html?cat=Knitwear">Knitwear</a>
       </div>
@@ -363,30 +365,19 @@ input, select, textarea { font-family: var(--font-body); }
     </div>
   </nav>
 
-  <div class="container" style="padding-top:20px;padding-bottom:4px;">
-    <a href="plp.html" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);">← Collection</a>
+  
+  <div class="container" style="padding-top:18px">
+    <a href="plp.html" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);font-weight:500">← Collection</a>
   </div>
-
   <main class="container" id="pdp-content"></main>
-
-  <section class="container" style="border-top:1px solid var(--border);padding-top:48px;margin-bottom:80px;">
-    <div class="section-header" style="padding-top:0">
-      <h2 class="section-title">You may also like</h2>
-    </div>
+  <section class="container" style="border-top:1px solid var(--border);padding-top:40px;margin-bottom:72px">
+    <div class="section-header" style="padding-top:0"><h2 class="section-title">You may also like</h2></div>
     <div class="product-grid" id="related-grid"></div>
   </section>
-
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-logo">Merkle<span>Shop</span></div>
-      <p class="footer-copy">© 2025 MerkleShop. Demo store — no real transactions.</p>
-    </div>
-  </footer>
-
+  <footer class="footer"><div class="footer-inner"><div class="footer-logo">Merkle<span>Shop</span></div><p class="footer-copy">© 2025 MerkleShop. Demo store.</p></div></footer>
   <div id="toast" class="toast"></div>
 
-  <script>
-const PRODUCTS = [
+  <script>const PRODUCTS = [
   {
     id: 1,
     name: "Oversized Wool Coat",
@@ -508,10 +499,8 @@ const PRODUCTS = [
     new: false
   }
 ];
-
 </script>
-  <script>
-const CART_KEY = 'merkleshop_cart';
+  <script>const CART_KEY = 'merkleshop_cart';
 window.dataLayer = window.dataLayer || [];
 
 const Cart = {
@@ -639,107 +628,71 @@ function formatPrice(n) {
 document.addEventListener('DOMContentLoaded', () => {
   Cart.updateBadge();
 });
-
 </script>
   <script>
+
     window.dataLayer = window.dataLayer || [];
-
     const params = new URLSearchParams(window.location.search);
-    const productId = parseInt(params.get('id'));
-    const product = PRODUCTS.find(p => p.id === productId);
+    const product = PRODUCTS.find(p => p.id === parseInt(params.get('id')));
+    if (!product) { window.location.href = 'plp.html'; throw new Error('no product'); }
 
-    if (!product) {
-      window.location.href = 'plp.html';
-    } else {
-      document.getElementById('page-title').textContent = product.name + ' — MerkleShop';
+    document.title = product.name + ' — MerkleShop';
+    dataLayer.push({ ecommerce: null });
+    dataLayer.push({ event: 'view_item', ecommerce: { currency: 'EUR', value: product.price, items: [{ item_id: String(product.id), item_name: product.name, item_category: product.category, price: product.price, quantity: 1 }] } });
 
-      dataLayer.push({ ecommerce: null });
-      dataLayer.push({
-        event: 'view_item',
-        ecommerce: {
-          currency: 'EUR',
-          value: product.price,
-          items: [{ item_id: String(product.id), item_name: product.name, item_category: product.category, price: product.price, quantity: 1 }]
-        }
-      });
+    let selectedSize = null;
 
-      let selectedSize = null;
-
-      document.getElementById('pdp-content').innerHTML = `
-        <div class="pdp-layout">
-          <div class="pdp-images">
-            <div class="main-image">
-              <img src="${product.image}" alt="${product.name}">
-            </div>
+    document.getElementById('pdp-content').innerHTML = `
+      <div class="pdp-layout">
+        <div class="pdp-images"><div class="main-image"><img src="${product.image}" alt="${product.name}"></div></div>
+        <div class="pdp-sticky">
+          <p class="pdp-eyebrow">${product.category}</p>
+          <h1 class="pdp-title">${product.name}</h1>
+          <p class="pdp-price">${formatPrice(product.price)}</p>
+          <p class="pdp-desc">${product.description}</p>
+          <p class="size-label">Size ${product.sizes.length > 1 ? '<span style="color:var(--mid);font-weight:300"> — select one</span>' : ''}</p>
+          <div class="size-grid" id="size-grid">
+            ${product.sizes.map(s => `<button class="size-btn" onclick="selectSize('${s}')">${s}</button>`).join('')}
           </div>
-          <div class="pdp-sticky">
-            <p class="pdp-eyebrow">${product.category}</p>
-            <h1 class="pdp-title">${product.name}</h1>
-            <p class="pdp-price">${formatPrice(product.price)}</p>
-            <p class="pdp-desc">${product.description}</p>
-            <p class="size-label">Size ${product.sizes.length > 1 ? '<span style="color:var(--mid);font-weight:300">— Select one</span>' : ''}</p>
-            <div class="size-grid" id="size-grid">
-              ${product.sizes.map(s => `<button class="size-btn" onclick="selectSize('${s}')">${s}</button>`).join('')}
-            </div>
-            <button class="btn-add-cart" id="add-btn" onclick="handleAddToCart()" ${product.sizes.length > 1 ? 'disabled' : ''}>
-              Add to Cart
-            </button>
-            <a href="cart.html" class="btn-secondary" style="width:100%;justify-content:center;margin-top:8px">View Cart</a>
-            <div class="pdp-meta">
-              <div>Material <span>${product.material}</span></div>
-              <div>Delivery <span>3–5 working days</span></div>
-              <div>Returns <span>Free within 30 days</span></div>
-            </div>
+          <button class="btn-add-cart" id="add-btn" onclick="handleAddToCart()" ${product.sizes.length > 1 ? 'disabled' : ''}>Add to Cart</button>
+          <a href="cart.html" class="btn-secondary" style="width:100%;justify-content:center;margin-top:8px;display:flex">View Cart</a>
+          <div class="pdp-meta">
+            <div>Material <span>${product.material}</span></div>
+            <div>Delivery <span>3–5 working days</span></div>
+            <div>Returns <span>Free within 30 days</span></div>
           </div>
         </div>
-      `;
+      </div>`;
 
-      // Auto-select if only one size
-      if (product.sizes.length === 1) {
-        selectSize(product.sizes[0]);
-      }
+    if (product.sizes.length === 1) selectSize(product.sizes[0]);
 
-      function selectSize(size) {
-        selectedSize = size;
-        document.querySelectorAll('.size-btn').forEach(btn => {
-          btn.classList.toggle('active', btn.textContent.trim() === size);
-        });
-        document.getElementById('add-btn').disabled = false;
-      }
-
-      function handleAddToCart() {
-        if (!selectedSize) return;
-        Cart.add(product.id, selectedSize, 1);
-        const toast = document.getElementById('toast');
-        toast.textContent = product.name + ' added to cart';
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2500);
-      }
-
-      // Expose to global scope (called from inline onclick)
-      window.selectSize = selectSize;
-      window.handleAddToCart = handleAddToCart;
-
-      // Related products
-      const related = PRODUCTS
-        .filter(p => p.id !== product.id)
-        .sort((a, b) => (b.category === product.category) - (a.category === product.category))
-        .slice(0, 3);
-
-      document.getElementById('related-grid').innerHTML = related.map(p => `
-        <div class="product-card" onclick="window.location.href='pdp.html?id=${p.id}'">
-          ${p.new ? '<span class="product-badge">New</span>' : ''}
-          <div class="product-img">
-            <img src="${p.image}" alt="${p.name}" loading="lazy">
-          </div>
-          <div class="product-info">
-            <p class="product-category">${p.category}</p>
-            <p class="product-name">${p.name}</p>
-            <p class="product-price">${formatPrice(p.price)}</p>
-          </div>
-        </div>
-      `).join('');
+    function selectSize(size) {
+      selectedSize = size;
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === size));
+      document.getElementById('add-btn').disabled = false;
     }
+    function handleAddToCart() {
+      if (!selectedSize) return;
+      Cart.add(product.id, selectedSize, 1);
+      const t = document.getElementById('toast');
+      t.textContent = product.name + ' added to cart';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+    window.selectSize = selectSize;
+    window.handleAddToCart = handleAddToCart;
+
+    const related = PRODUCTS.filter(p => p.id !== product.id).sort((a,b) => (b.category === product.category)-(a.category === product.category)).slice(0,3);
+    document.getElementById('related-grid').innerHTML = related.map(p => `
+      <div class="product-card" onclick="window.location.href='pdp.html?id=${p.id}'">
+        ${p.new ? '<span class="product-badge">New</span>' : ''}
+        <div class="product-img"><img src="${p.image}" alt="${p.name}" loading="lazy"></div>
+        <div class="product-info">
+          <p class="product-category">${p.category}</p>
+          <p class="product-name">${p.name}</p>
+          <p class="product-price">${formatPrice(p.price)}</p>
+        </div>
+      </div>`).join('');
   </script>
 </body>
 </html>
