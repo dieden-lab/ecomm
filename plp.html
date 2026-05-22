@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Collection — MerkleShop</title>
-  <!-- TODO: GTM Head snippet -->
+  <!-- GTM HEAD: (function(w,d,s,l,i){...})(window,document,'script','dataLayer','GTM-XXXXXXX'); -->
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
 
@@ -338,15 +338,17 @@ input, select, textarea { font-family: var(--font-body); }
   .container { padding: 0 20px; }
 }
 
-</style>
+  </style>
+  
 </head>
 <body>
-  <!-- TODO: GTM Body noscript -->
+  <!-- GTM BODY: <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"...></noscript> -->
 
   <nav class="nav">
     <div class="nav-inner">
+      
       <div class="nav-left">
-        <a href="plp.html" class="active">Collection</a>
+        <a href="plp.html" class='active'>Collection</a>
         <a href="plp.html?cat=Outerwear">Outerwear</a>
         <a href="plp.html?cat=Knitwear">Knitwear</a>
       </div>
@@ -363,10 +365,11 @@ input, select, textarea { font-family: var(--font-body); }
     </div>
   </nav>
 
+  
   <main class="container">
     <div class="page-header">
       <h1 id="page-title">All Products</h1>
-      <p>Timeless pieces for a considered wardrobe.</p>
+      <p>Curated pieces for a considered wardrobe.</p>
     </div>
     <div class="plp-controls">
       <div class="filter-tags" id="filter-tags"></div>
@@ -374,16 +377,10 @@ input, select, textarea { font-family: var(--font-body); }
     </div>
     <div class="product-grid cols-4" id="product-grid"></div>
   </main>
+  <footer class="footer"><div class="footer-inner"><div class="footer-logo">Merkle<span>Shop</span></div><p class="footer-copy">© 2025 MerkleShop. Demo store.</p></div></footer>
+  <div id="toast" class="toast"></div>
 
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-logo">Merkle<span>Shop</span></div>
-      <p class="footer-copy">© 2025 MerkleShop. Demo store — no real transactions.</p>
-    </div>
-  </footer>
-
-  <script>
-const PRODUCTS = [
+  <script>const PRODUCTS = [
   {
     id: 1,
     name: "Oversized Wool Coat",
@@ -505,10 +502,8 @@ const PRODUCTS = [
     new: false
   }
 ];
-
 </script>
-  <script>
-const CART_KEY = 'merkleshop_cart';
+  <script>const CART_KEY = 'merkleshop_cart';
 window.dataLayer = window.dataLayer || [];
 
 const Cart = {
@@ -636,84 +631,47 @@ function formatPrice(n) {
 document.addEventListener('DOMContentLoaded', () => {
   Cart.updateBadge();
 });
-
 </script>
   <script>
-    window.dataLayer = window.dataLayer || [];
 
+    window.dataLayer = window.dataLayer || [];
     const params = new URLSearchParams(window.location.search);
     const catParam = params.get('cat');
     let activeFilter = catParam || 'All';
-
     if (catParam) document.getElementById('page-title').textContent = catParam;
-
     const categories = ['All', ...new Set(PRODUCTS.map(p => p.category))];
-
     document.getElementById('filter-tags').innerHTML = categories.map(c =>
       `<button class="filter-tag ${c === activeFilter ? 'active' : ''}" onclick="setFilter('${c}')">${c}</button>`
     ).join('');
-
-    function getFiltered() {
-      return activeFilter === 'All' ? PRODUCTS : PRODUCTS.filter(p => p.category === activeFilter);
-    }
-
     function setFilter(cat) {
       activeFilter = cat;
-      document.querySelectorAll('.filter-tag').forEach(btn => {
-        btn.classList.toggle('active', btn.textContent === cat);
-      });
-      const url = new URL(window.location);
-      cat === 'All' ? url.searchParams.delete('cat') : url.searchParams.set('cat', cat);
-      history.replaceState(null, '', url);
+      document.querySelectorAll('.filter-tag').forEach(b => b.classList.toggle('active', b.textContent === cat));
+      const u = new URL(window.location); cat === 'All' ? u.searchParams.delete('cat') : u.searchParams.set('cat', cat);
+      history.replaceState(null, '', u);
       renderGrid();
     }
-
     function renderGrid() {
-      const filtered = getFiltered();
-      document.getElementById('product-count').textContent = `${filtered.length} prodotti`;
-
+      const filtered = activeFilter === 'All' ? PRODUCTS : PRODUCTS.filter(p => p.category === activeFilter);
+      document.getElementById('product-count').textContent = filtered.length + ' products';
       dataLayer.push({ ecommerce: null });
-      dataLayer.push({
-        event: 'view_item_list',
-        ecommerce: {
-          item_list_id: activeFilter.toLowerCase().replace(/ /g, '_'),
-          item_list_name: activeFilter,
-          items: filtered.map((p, i) => ({
-            item_id: String(p.id), item_name: p.name,
-            item_category: p.category, price: p.price, index: i
-          }))
-        }
-      });
-
-      document.getElementById('product-grid').innerHTML = filtered.map((p, i) => `
-        <div class="product-card" onclick="selectProduct(${p.id}, ${i})">
+      dataLayer.push({ event: 'view_item_list', ecommerce: { item_list_id: activeFilter.toLowerCase().replace(/ /g,'_'), item_list_name: activeFilter, items: filtered.map((p,i) => ({ item_id: String(p.id), item_name: p.name, item_category: p.category, price: p.price, index: i })) } });
+      document.getElementById('product-grid').innerHTML = filtered.map((p,i) => `
+        <div class="product-card" onclick="goProduct(${p.id},${i})">
           ${p.new ? '<span class="product-badge">New</span>' : ''}
-          <div class="product-img">
-            <img src="${p.image}" alt="${p.name}" loading="lazy">
-          </div>
+          <div class="product-img"><img src="${p.image}" alt="${p.name}" loading="lazy"></div>
           <div class="product-info">
             <p class="product-category">${p.category}</p>
             <p class="product-name">${p.name}</p>
             <p class="product-price">${formatPrice(p.price)}</p>
           </div>
-        </div>
-      `).join('');
+        </div>`).join('');
     }
-
-    function selectProduct(id, index) {
-      const product = PRODUCTS.find(p => p.id === id);
+    function goProduct(id, index) {
+      const p = PRODUCTS.find(p => p.id === id);
       dataLayer.push({ ecommerce: null });
-      dataLayer.push({
-        event: 'select_item',
-        ecommerce: {
-          item_list_id: activeFilter.toLowerCase().replace(/ /g, '_'),
-          item_list_name: activeFilter,
-          items: [{ item_id: String(product.id), item_name: product.name, item_category: product.category, price: product.price, index: index }]
-        }
-      });
-      window.location.href = `pdp.html?id=${id}`;
+      dataLayer.push({ event: 'select_item', ecommerce: { item_list_id: activeFilter.toLowerCase().replace(/ /g,'_'), item_list_name: activeFilter, items: [{ item_id: String(p.id), item_name: p.name, item_category: p.category, price: p.price, index }] } });
+      window.location.href = 'pdp.html?id=' + id;
     }
-
     renderGrid();
   </script>
 </body>
