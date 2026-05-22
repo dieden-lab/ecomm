@@ -1,4 +1,509 @@
-const CART_KEY = 'arco_cart';
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart — MerkleShop</title>
+  <!-- TODO: GTM Head snippet -->
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
+
+:root {
+  --blue:        #1A3FAA;
+  --blue-dark:   #0F2670;
+  --blue-light:  #EEF2FF;
+  --red:         #E8192C;
+  --red-dark:    #B5101E;
+  --white:       #FFFFFF;
+  --off-white:   #F5F7FF;
+  --charcoal:    #0A0F2E;
+  --mid:         #5A6080;
+  --border:      #DCE3F5;
+  --font-display:'Syne', sans-serif;
+  --font-body:   'Inter', sans-serif;
+  --nav-h:       64px;
+  --max:         1280px;
+  --radius:      3px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--white);
+  color: var(--charcoal);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: var(--font-body); border: none; background: none; }
+img { display: block; width: 100%; height: 100%; object-fit: cover; }
+input, select, textarea { font-family: var(--font-body); }
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  height: var(--nav-h);
+  background: var(--blue-dark);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.nav-inner {
+  max-width: var(--max); margin: 0 auto; padding: 0 32px; width: 100%;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 100%;
+}
+.nav-left { display: flex; gap: 28px; }
+.nav-left a {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.65); transition: color 0.2s;
+}
+.nav-left a:hover, .nav-left a.active { color: #fff; }
+.nav-logo {
+  font-family: var(--font-display); font-size: 18px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; text-align: center;
+  color: var(--white);
+}
+.nav-logo span { color: var(--red); }
+.nav-right { display: flex; justify-content: flex-end; }
+.cart-btn {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.75);
+  padding: 8px 12px; transition: color 0.2s;
+}
+.cart-btn:hover { color: #fff; }
+.cart-icon { position: relative; display: flex; }
+.cart-icon svg { width: 18px; height: 18px; }
+#cart-count {
+  position: absolute; top: -6px; right: -8px;
+  background: var(--red); color: white; border-radius: 50%;
+  width: 16px; height: 16px; font-size: 9px; font-weight: 600;
+  display: none; align-items: center; justify-content: center;
+}
+
+/* ── FOOTER ── */
+.footer { background: var(--blue-dark); padding: 40px 32px; margin-top: 80px; }
+.footer-inner {
+  max-width: var(--max); margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-logo {
+  font-family: var(--font-display); font-size: 16px; font-weight: 700;
+  text-transform: uppercase; color: var(--white); letter-spacing: 0.05em;
+}
+.footer-logo span { color: var(--red); }
+.footer-copy { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+/* ── CONTAINER ── */
+.container { max-width: var(--max); margin: 0 auto; padding: 0 32px; }
+
+/* ── HERO ── */
+.hero {
+  background: var(--blue-dark);
+  padding: 100px 32px 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 110%, var(--blue) 0%, transparent 65%);
+  opacity: 0.6;
+}
+.hero-eyebrow {
+  font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 20px; position: relative; font-weight: 500;
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 7vw, 88px);
+  font-weight: 700; line-height: 1.0;
+  color: var(--white);
+  margin-bottom: 24px; position: relative; letter-spacing: -0.02em;
+}
+.hero h1 em { font-style: normal; color: var(--red); }
+.hero-sub {
+  font-size: 15px; color: rgba(255,255,255,0.65);
+  max-width: 420px; margin: 0 auto 40px;
+  line-height: 1.7; position: relative;
+}
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--red); color: white;
+  padding: 14px 32px; font-size: 11px;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  font-weight: 600; transition: background 0.2s;
+  border-radius: var(--radius); position: relative;
+}
+.btn-primary:hover { background: var(--red-dark); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: transparent; color: var(--charcoal);
+  padding: 13px 32px; font-size: 11px; letter-spacing: 0.15em;
+  text-transform: uppercase; font-weight: 500;
+  border: 1px solid var(--border);
+  transition: border-color 0.2s, background 0.2s; border-radius: var(--radius);
+}
+.btn-secondary:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+
+/* ── SECTION HEADER ── */
+.section-header {
+  padding: 56px 0 36px;
+  display: flex; align-items: baseline; justify-content: space-between;
+}
+.section-title {
+  font-family: var(--font-display); font-size: 30px; font-weight: 700;
+  letter-spacing: -0.01em; color: var(--charcoal);
+}
+.section-link {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--blue);
+  border-bottom: 1px solid transparent; transition: border-color 0.2s;
+}
+.section-link:hover { border-color: var(--blue); }
+
+/* ── PRODUCT GRID ── */
+.product-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-bottom: 20px;
+}
+.product-grid.cols-4 { grid-template-columns: repeat(4,1fr); }
+.product-card {
+  background: var(--off-white); border-radius: 4px;
+  cursor: pointer; overflow: hidden;
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.product-card:hover {
+  box-shadow: 0 8px 24px rgba(26,63,170,0.12);
+  transform: translateY(-2px);
+}
+.product-card:hover .product-img img { transform: scale(1.04); }
+.product-img { aspect-ratio: 3/4; overflow: hidden; background: var(--border); }
+.product-img img { transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94); }
+.product-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: var(--red); color: white;
+  font-size: 9px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 2px;
+}
+.product-card { position: relative; }
+.product-info { padding: 14px 14px 18px; }
+.product-name { font-size: 13px; font-weight: 500; margin-bottom: 3px; line-height: 1.3; }
+.product-category {
+  font-size: 10px; color: var(--mid); letter-spacing: 0.08em;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.product-price { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--blue); }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  padding: 48px 0 36px; border-bottom: 1px solid var(--border); margin-bottom: 36px;
+}
+.page-header h1 {
+  font-family: var(--font-display); font-size: 42px; font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1; color: var(--charcoal);
+}
+.page-header p { font-size: 14px; color: var(--mid); margin-top: 10px; }
+
+/* ── PLP FILTERS ── */
+.plp-controls {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
+}
+.filter-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-tag {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 7px 16px;
+  border: 1px solid var(--border); border-radius: 20px;
+  cursor: pointer; transition: all 0.2s; color: var(--mid); background: transparent;
+}
+.filter-tag:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+.filter-tag.active { background: var(--blue); color: white; border-color: var(--blue); }
+.plp-count { font-size: 12px; color: var(--mid); }
+
+/* ── PDP ── */
+.pdp-layout {
+  display: grid; grid-template-columns: 1fr 460px;
+  gap: 72px; padding: 40px 0 72px; align-items: start;
+}
+.pdp-images .main-image {
+  aspect-ratio: 3/4; background: var(--off-white);
+  border-radius: 4px; overflow: hidden; border: 1px solid var(--border);
+}
+.pdp-sticky { position: sticky; top: calc(var(--nav-h) + 28px); }
+.pdp-eyebrow {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--blue); margin-bottom: 10px;
+}
+.pdp-title {
+  font-family: var(--font-display); font-size: 36px; font-weight: 700;
+  line-height: 1.1; margin-bottom: 8px; letter-spacing: -0.02em;
+}
+.pdp-price {
+  font-family: var(--font-display); font-size: 28px; font-weight: 700;
+  color: var(--blue); margin-bottom: 24px;
+}
+.pdp-desc { font-size: 14px; line-height: 1.75; color: var(--mid); margin-bottom: 28px; }
+.size-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; font-weight: 500; }
+.size-grid { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.size-btn {
+  width: 50px; height: 50px; border: 1px solid var(--border); font-size: 12px;
+  font-weight: 500; transition: all 0.2s; color: var(--mid);
+}
+.size-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+.size-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+.btn-add-cart {
+  width: 100%; background: var(--blue); color: white; padding: 16px;
+  font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+  font-weight: 600; transition: background 0.2s; border-radius: var(--radius); margin-bottom: 10px;
+}
+.btn-add-cart:hover { background: var(--blue-dark); }
+.btn-add-cart:disabled { background: var(--border); color: var(--mid); cursor: not-allowed; }
+.pdp-meta {
+  margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border);
+  font-size: 12px; color: var(--mid); line-height: 2;
+}
+.pdp-meta span { color: var(--charcoal); font-weight: 500; }
+
+/* ── CART ── */
+.cart-layout {
+  display: grid; grid-template-columns: 1fr 340px;
+  gap: 56px; padding: 40px 0 72px; align-items: start;
+}
+.cart-item {
+  display: grid; grid-template-columns: 90px 1fr auto;
+  gap: 20px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--border);
+}
+.cart-item-img {
+  aspect-ratio: 3/4; background: var(--off-white);
+  border-radius: 3px; overflow: hidden; border: 1px solid var(--border);
+}
+.cart-item-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.cart-item-meta { font-size: 12px; color: var(--mid); margin-bottom: 12px; }
+.qty-control { display: flex; align-items: center; border: 1px solid var(--border); width: fit-content; border-radius: 3px; overflow: hidden; }
+.qty-btn { width: 32px; height: 32px; font-size: 16px; display: flex; align-items: center; justify-content: center; color: var(--mid); transition: all 0.2s; }
+.qty-btn:hover { color: var(--blue); background: var(--blue-light); }
+.qty-val { width: 40px; height: 32px; text-align: center; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+.cart-item-price { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--blue); text-align: right; }
+.remove-btn { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); text-decoration: underline; margin-top: 8px; display: block; transition: color 0.2s; }
+.remove-btn:hover { color: var(--red); }
+.cart-summary { background: var(--off-white); padding: 28px; border-radius: 4px; border: 1px solid var(--border); position: sticky; top: calc(var(--nav-h) + 20px); }
+.summary-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.summary-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; color: var(--mid); }
+.summary-row.total { font-size: 15px; color: var(--charcoal); font-weight: 500; padding-top: 14px; margin-top: 6px; border-top: 1px solid var(--border); }
+.summary-row.total .amount { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--blue); }
+.empty-cart { text-align: center; padding: 72px 0; }
+.empty-cart h2 { font-family: var(--font-display); font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+.empty-cart p { font-size: 14px; color: var(--mid); margin-bottom: 28px; }
+
+/* ── CHECKOUT ── */
+.checkout-layout { display: grid; grid-template-columns: 1fr 340px; gap: 56px; padding: 40px 0 72px; align-items: start; }
+.checkout-section { margin-bottom: 36px; }
+.checkout-section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid.full { grid-template-columns: 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mid); font-weight: 500; }
+.form-group input, .form-group select { border: 1px solid var(--border); padding: 11px 13px; font-size: 14px; color: var(--charcoal); background: var(--white); border-radius: var(--radius); transition: border-color 0.2s; outline: none; }
+.form-group input:focus, .form-group select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,63,170,0.08); }
+.form-group.span-2 { grid-column: 1 / -1; }
+
+/* ── THANK YOU ── */
+.thankyou-wrap { max-width: 580px; margin: 0 auto; padding: 72px 32px; text-align: center; }
+.ty-icon { width: 60px; height: 60px; background: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 28px; }
+.ty-icon svg { width: 26px; height: 26px; color: white; }
+.ty-title { font-family: var(--font-display); font-size: 48px; font-weight: 700; line-height: 1; margin-bottom: 14px; letter-spacing: -0.02em; color: var(--charcoal); }
+.ty-title em { color: var(--blue); font-style: normal; }
+.ty-sub { font-size: 15px; color: var(--mid); line-height: 1.7; margin-bottom: 36px; }
+.order-summary-box { background: var(--off-white); border-radius: 4px; border: 1px solid var(--border); padding: 24px; text-align: left; margin-bottom: 36px; }
+.order-ref { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+.order-ref span { color: var(--charcoal); font-weight: 600; font-size: 13px; }
+.ty-item { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--mid); }
+.ty-item:last-child { border-bottom: none; }
+.ty-item .name { color: var(--charcoal); }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 28px; right: 28px; background: var(--blue-dark); color: white; padding: 13px 20px; font-size: 12px; font-weight: 500; border-radius: var(--radius); transform: translateY(120%); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); z-index: 1000; border-left: 3px solid var(--red); }
+.toast.show { transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .product-grid { grid-template-columns: repeat(2,1fr); }
+  .product-grid.cols-4 { grid-template-columns: repeat(2,1fr); }
+  .pdp-layout, .cart-layout, .checkout-layout { grid-template-columns: 1fr; }
+  .pdp-sticky { position: static; }
+  .nav-inner { padding: 0 20px; }
+  .nav-left { display: none; }
+  .hero { padding: 64px 20px; }
+  .container { padding: 0 20px; }
+}
+
+</style>
+</head>
+<body>
+  <!-- TODO: GTM Body noscript -->
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <a href="plp.html">Collection</a>
+        <a href="plp.html?cat=Outerwear">Outerwear</a>
+        <a href="plp.html?cat=Knitwear">Knitwear</a>
+      </div>
+      <a href="index.html" class="nav-logo">Merkle<span>Shop</span></a>
+      <div class="nav-right">
+        <a href="cart.html" class="cart-btn">
+          <span>Cart</span>
+          <span class="cart-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span id="cart-count"></span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Your Cart</h1>
+    </div>
+    <div id="cart-content"></div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Merkle<span>Shop</span></div>
+      <p class="footer-copy">© 2025 MerkleShop. Demo store — no real transactions.</p>
+    </div>
+  </footer>
+
+  <script>
+const PRODUCTS = [
+  {
+    id: 1,
+    name: "Oversized Wool Coat",
+    price: 420,
+    category: "Outerwear",
+    image: "https://picsum.photos/seed/arco1/600/800",
+    description: "Structured silhouette in pure merino wool. Cut wide through the shoulder, tapering to a clean hem. A timeless piece engineered for modern proportions.",
+    material: "100% Merino Wool",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    featured: true,
+    new: false
+  },
+  {
+    id: 2,
+    name: "Ribbed Turtleneck",
+    price: 145,
+    category: "Knitwear",
+    image: "https://picsum.photos/seed/arco2/600/800",
+    description: "Fine-gauge ribbed knit with elongated silhouette. A wardrobe essential refined in cashmere-blend yarn.",
+    material: "70% Wool, 30% Cashmere",
+    sizes: ["XS", "S", "M", "L"],
+    featured: true,
+    new: true
+  },
+  {
+    id: 3,
+    name: "Wide-Leg Trousers",
+    price: 195,
+    category: "Trousers",
+    image: "https://picsum.photos/seed/arco3/600/800",
+    description: "High-rise silhouette with generous leg opening. Crafted in fluid technical fabric that holds its shape.",
+    material: "65% Polyester, 35% Viscose",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    featured: true,
+    new: false
+  },
+  {
+    id: 4,
+    name: "Silk Slip Dress",
+    price: 280,
+    category: "Dresses",
+    image: "https://picsum.photos/seed/arco4/600/800",
+    description: "Bias-cut silk with adjustable straps. Minimal seaming for a clean, uninterrupted drape.",
+    material: "100% Silk",
+    sizes: ["XS", "S", "M", "L"],
+    featured: true,
+    new: true
+  },
+  {
+    id: 5,
+    name: "Leather Belt",
+    price: 85,
+    category: "Accessories",
+    image: "https://picsum.photos/seed/arco5/600/800",
+    description: "Full-grain vegetable-tanned leather. Minimal squared buckle in brushed brass.",
+    material: "Full-grain Leather",
+    sizes: ["S/M", "M/L"],
+    featured: false,
+    new: false
+  },
+  {
+    id: 6,
+    name: "Cashmere Scarf",
+    price: 165,
+    category: "Accessories",
+    image: "https://picsum.photos/seed/arco6/600/800",
+    description: "200×65 cm in two-ply Mongolian cashmere. Blanket-weight softness with controlled fringe.",
+    material: "100% Cashmere",
+    sizes: ["One Size"],
+    featured: false,
+    new: false
+  },
+  {
+    id: 7,
+    name: "Structured Blazer",
+    price: 350,
+    category: "Outerwear",
+    image: "https://picsum.photos/seed/arco7/600/800",
+    description: "Half-canvas construction with padded shoulders. Clean lapel, single button. Works as a jacket or layering piece.",
+    material: "80% Wool, 20% Polyester",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    featured: true,
+    new: false
+  },
+  {
+    id: 8,
+    name: "Denim Jacket",
+    price: 220,
+    category: "Outerwear",
+    image: "https://picsum.photos/seed/arco8/600/800",
+    description: "12oz raw selvedge denim. Boxy cut, minimal hardware, interior seam detailing.",
+    material: "100% Cotton Selvedge Denim",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    featured: false,
+    new: true
+  },
+  {
+    id: 9,
+    name: "Pleated Midi Skirt",
+    price: 175,
+    category: "Skirts",
+    image: "https://picsum.photos/seed/arco9/600/800",
+    description: "Box pleats from hip to hem. Elastic waistband disguised by clean waistband panel. Fluid crêpe fabric.",
+    material: "100% Viscose Crêpe",
+    sizes: ["XS", "S", "M", "L"],
+    featured: false,
+    new: false
+  },
+  {
+    id: 10,
+    name: "Oversized Linen Shirt",
+    price: 130,
+    category: "Tops",
+    image: "https://picsum.photos/seed/arco10/600/800",
+    description: "Garment-washed Belgian linen. Dropped shoulder, curved hem, hidden button placket.",
+    material: "100% Belgian Linen",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    featured: true,
+    new: false
+  }
+];
+
+</script>
+  <script>
+const CART_KEY = 'merkleshop_cart';
 window.dataLayer = window.dataLayer || [];
 
 const Cart = {
@@ -126,3 +631,105 @@ function formatPrice(n) {
 document.addEventListener('DOMContentLoaded', () => {
   Cart.updateBadge();
 });
+
+</script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function renderCart() {
+      const items = Cart.get();
+      const content = document.getElementById('cart-content');
+
+      if (items.length === 0) {
+        content.innerHTML = `
+          <div class="empty-cart">
+            <h2>Your cart is empty</h2>
+            <p>Add something beautiful to get started.</p>
+            <a href="plp.html" class="btn-primary" style="display:inline-flex">Explore Collection</a>
+          </div>`;
+        return;
+      }
+
+      const subtotal = Cart.total();
+      const shipping = subtotal >= 200 ? 0 : 12;
+      const total = subtotal + shipping;
+
+      dataLayer.push({ ecommerce: null });
+      dataLayer.push({
+        event: 'view_cart',
+        ecommerce: { currency: 'EUR', value: total, items: Cart.getItemsForDL() }
+      });
+
+      content.innerHTML = `
+        <div class="cart-layout">
+          <div class="cart-items">
+            ${items.map((item, i) => {
+              const p = PRODUCTS.find(p => p.id === item.productId);
+              if (!p) return '';
+              return `
+                <div class="cart-item">
+                  <a href="pdp.html?id=${p.id}">
+                    <div class="cart-item-img">
+                      <img src="${p.image}" alt="${p.name}">
+                    </div>
+                  </a>
+                  <div>
+                    <p class="cart-item-name">${p.name}</p>
+                    <p class="cart-item-meta">Size: ${item.size} · ${p.category}</p>
+                    <div class="qty-control">
+                      <button class="qty-btn" onclick="changeQty(${i}, ${item.quantity - 1})">−</button>
+                      <span class="qty-val">${item.quantity}</span>
+                      <button class="qty-btn" onclick="changeQty(${i}, ${item.quantity + 1})">+</button>
+                    </div>
+                    <button class="remove-btn" onclick="removeItem(${i})">Remove</button>
+                  </div>
+                  <div style="text-align:right">
+                    <p class="cart-item-price">${formatPrice(p.price * item.quantity)}</p>
+                    <p style="font-size:12px;color:var(--mid);margin-top:4px">${formatPrice(p.price)} each</p>
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+
+          <div class="cart-summary">
+            <h2 class="summary-title">Order Summary</h2>
+            <div class="summary-row"><span>Subtotal</span><span>${formatPrice(subtotal)}</span></div>
+            <div class="summary-row"><span>Shipping</span><span>${shipping === 0 ? 'Free' : formatPrice(shipping)}</span></div>
+            ${shipping > 0 ? `<p style="font-size:11px;color:var(--accent);margin-bottom:12px">Add ${formatPrice(200 - subtotal)} for free shipping</p>` : ''}
+            <div class="summary-row total">
+              <span>Total</span>
+              <span class="amount">${formatPrice(total)}</span>
+            </div>
+            <button class="btn-primary" style="width:100%;justify-content:center;margin-top:20px" onclick="goToCheckout()">
+              Proceed to Checkout
+            </button>
+            <a href="plp.html" class="btn-secondary" style="width:100%;justify-content:center;margin-top:8px;display:flex">
+              Continue Shopping
+            </a>
+          </div>
+        </div>`;
+    }
+
+    function changeQty(index, qty) {
+      Cart.updateQuantity(index, qty);
+      renderCart();
+    }
+
+    function removeItem(index) {
+      Cart.remove(index);
+      renderCart();
+    }
+
+    function goToCheckout() {
+      dataLayer.push({ ecommerce: null });
+      dataLayer.push({
+        event: 'begin_checkout',
+        ecommerce: { currency: 'EUR', value: Cart.total(), items: Cart.getItemsForDL() }
+      });
+      window.location.href = 'checkout.html';
+    }
+
+    renderCart();
+  </script>
+</body>
+</html>
