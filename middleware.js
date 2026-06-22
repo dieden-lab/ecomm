@@ -6,7 +6,7 @@ export default function middleware(request) {
   const auth = request.headers.get('authorization');
 
   const validUser = 'merkle';
-  const validPass = 'elkrem';
+  const validPass = 'demo2025';
   const expected = 'Basic ' + btoa(`${validUser}:${validPass}`);
 
   if (auth !== expected) {
