@@ -100,7 +100,7 @@ const PRODUCTS = [
     name: "Pleated Midi Skirt",
     price: 175,
     category: "Skirts",
-    image: "https://images.unsplash.com/photo-1583496661160-fb5974ca5e52?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1551163943-3f7253f8e04b?w=600&q=80",
     description: "Box pleats from hip to hem. Elastic waistband disguised by clean waistband panel. Fluid crêpe fabric.",
     material: "100% Viscose Crêpe",
     sizes: ["XS", "S", "M", "L"],
