@@ -94,21 +94,25 @@ function randomAddress() {
 }
 
 async function journeyBounce(page, source) {
-  await page.goto(buildUrl('/', source), { waitUntil: 'networkidle' });
+  await page.goto(buildUrl('/', source), { waitUntil: 'domcontentloaded' });
+  await sleep(randomInt(500, 1000));
   await humanScroll(page);
   await sleep(randomInt(3000, 8000));
 }
 
 async function journeyBrowseOnly(page, source) {
-  await page.goto(buildUrl('/', source), { waitUntil: 'networkidle' });
+  await page.goto(buildUrl('/', source), { waitUntil: 'domcontentloaded' });
+  await sleep(randomInt(500, 1000));
   await humanScroll(page);
   await sleep(randomInt(2000, 4000));
 
-  await page.goto(SITE_URL + '/plp.html', { waitUntil: 'networkidle' });
+  await page.goto(SITE_URL + '/plp.html', { waitUntil: 'domcontentloaded' });
+  await sleep(randomInt(500, 1000));
   await humanScroll(page);
   await sleep(randomInt(3000, 6000));
 
-  await page.goto(SITE_URL + randomPdpUrl(), { waitUntil: 'networkidle' });
+  await page.goto(SITE_URL + randomPdpUrl(), { waitUntil: 'domcontentloaded' });
+  await sleep(randomInt(500, 1000));
   await humanScroll(page);
   await sleep(randomInt(4000, 8000));
 }
@@ -122,7 +126,8 @@ async function journeyAddNoPurchase(page, source) {
     await sleep(randomInt(1000, 2000));
   }
 
-  await page.goto(SITE_URL + '/cart.html', { waitUntil: 'networkidle' });
+  await page.goto(SITE_URL + '/cart.html', { waitUntil: 'domcontentloaded' });
+  await sleep(randomInt(500, 1000));
   await humanScroll(page);
   await sleep(randomInt(5000, 12000));
 }
@@ -138,11 +143,13 @@ async function journeyFullPurchase(page, source) {
   }
 
   // Cart
-  await page.goto(SITE_URL + '/cart.html', { waitUntil: 'networkidle' });
+  await page.goto(SITE_URL + '/cart.html', { waitUntil: 'domcontentloaded' });
+  await sleep(randomInt(500, 1000));
   await sleep(randomInt(2000, 4000));
 
   // Checkout
-  await page.goto(SITE_URL + '/checkout.html', { waitUntil: 'networkidle' });
+  await page.goto(SITE_URL + '/checkout.html', { waitUntil: 'domcontentloaded' });
+  await sleep(randomInt(500, 1000));
   await humanScroll(page);
   await sleep(randomInt(2000, 4000));
 
@@ -225,7 +232,7 @@ async function journeyFullPurchase(page, source) {
     await submitBtn.click();
     await page.waitForURL('**/thankyou**', { timeout: 10000 }).catch(() => {});
   } else {
-    await page.goto(SITE_URL + '/thankyou.html', { waitUntil: 'networkidle' });
+    await page.goto(SITE_URL + '/thankyou.html', { waitUntil: 'domcontentloaded' });
   }
 
   await sleep(randomInt(3000, 6000));
