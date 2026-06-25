@@ -1,13 +1,11 @@
 const { chromium } = require('playwright');
 
-// ─── CONFIG ────────────────────────────────────────────────────────────────
-const SITE_URL = process.env.SITE_URL || 'https://your-merkle-shop.vercel.app';
-const BASIC_AUTH_USER = process.env.BASIC_AUTH_USER || '';
+const SITE_URL = process.env.SITE_URL || 'https://ecomm-pi-ivory.vercel.app';
+const BASIC_AUTH_USER = process.env.BASIC_AUTH_USER || 'merkle';
 const BASIC_AUTH_PASS = process.env.BASIC_AUTH_PASS || '';
 const TOTAL_SESSIONS = parseInt(process.env.SESSIONS || '100');
-const CONCURRENCY = 3; // sessioni parallele
+const CONCURRENCY = 3;
 
-// ─── DATI FAKE ─────────────────────────────────────────────────────────────
 const SOURCES = [
   { utm_source: 'google', utm_medium: 'cpc', utm_campaign: 'brand' },
   { utm_source: 'instagram', utm_medium: 'social', utm_campaign: 'spring_sale' },
@@ -18,26 +16,21 @@ const SOURCES = [
 ];
 
 const DEVICES = [
-  // Mobile (60%)
   { name: 'iPhone 14', userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1', viewport: { width: 390, height: 844 }, isMobile: true, weight: 20 },
   { name: 'Samsung Galaxy S23', userAgent: 'Mozilla/5.0 (Linux; Android 13; SM-S911B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36', viewport: { width: 360, height: 780 }, isMobile: true, weight: 20 },
   { name: 'iPhone 13 Mini', userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1', viewport: { width: 375, height: 812 }, isMobile: true, weight: 20 },
-  // Desktop (30%)
   { name: 'Windows Chrome', userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36', viewport: { width: 1440, height: 900 }, isMobile: false, weight: 15 },
   { name: 'MacOS Safari', userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15', viewport: { width: 1280, height: 800 }, isMobile: false, weight: 15 },
-  // Tablet (10%)
   { name: 'iPad Air', userAgent: 'Mozilla/5.0 (iPad; CPU OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1', viewport: { width: 820, height: 1180 }, isMobile: true, weight: 10 },
 ];
 
-// Journey types con probabilità diverse
 const JOURNEYS = [
-  { name: 'bounce', weight: 20 },           // homepage + bounce
-  { name: 'browse_only', weight: 25 },       // homepage → PLP → PDP
-  { name: 'add_no_purchase', weight: 20 },   // → cart → abbandono
-  { name: 'full_purchase', weight: 35 },     // → checkout → thank you
+  { name: 'bounce', weight: 20 },
+  { name: 'browse_only', weight: 25 },
+  { name: 'add_no_purchase', weight: 20 },
+  { name: 'full_purchase', weight: 35 },
 ];
 
-// ─── UTILS ─────────────────────────────────────────────────────────────────
 function weightedRandom(items) {
   const total = items.reduce((sum, i) => sum + i.weight, 0);
   let r = Math.random() * total;
@@ -66,6 +59,11 @@ function buildUrl(path, source) {
   return url.toString();
 }
 
+function randomPdpUrl() {
+  const id = randomInt(1, 10);
+  return `/pdp.html?id=${id}`;
+}
+
 async function humanScroll(page) {
   const scrolls = randomInt(2, 5);
   for (let i = 0; i < scrolls; i++) {
@@ -74,7 +72,6 @@ async function humanScroll(page) {
   }
 }
 
-// ─── JOURNEY HANDLERS ──────────────────────────────────────────────────────
 async function journeyBounce(page, source) {
   await page.goto(buildUrl('/', source), { waitUntil: 'networkidle' });
   await humanScroll(page);
@@ -86,17 +83,11 @@ async function journeyBrowseOnly(page, source) {
   await humanScroll(page);
   await sleep(randomInt(2000, 4000));
 
-  // Vai alla PLP (adatta il path al tuo sito)
-  const plpLinks = ['/category.html', '/products.html', '/shop.html'];
-  const plpPath = plpLinks[randomInt(0, plpLinks.length - 1)];
-  await page.goto(SITE_URL + plpPath, { waitUntil: 'networkidle' }).catch(() => {});
+  await page.goto(SITE_URL + '/plp.html', { waitUntil: 'networkidle' });
   await humanScroll(page);
   await sleep(randomInt(3000, 6000));
 
-  // Vai a una PDP
-  const pdpLinks = ['/product.html', '/product-detail.html'];
-  const pdpPath = pdpLinks[randomInt(0, pdpLinks.length - 1)];
-  await page.goto(SITE_URL + pdpPath, { waitUntil: 'networkidle' }).catch(() => {});
+  await page.goto(SITE_URL + randomPdpUrl(), { waitUntil: 'networkidle' });
   await humanScroll(page);
   await sleep(randomInt(4000, 8000));
 }
@@ -104,67 +95,69 @@ async function journeyBrowseOnly(page, source) {
 async function journeyAddNoPurchase(page, source) {
   await journeyBrowseOnly(page, source);
 
-  // Add to cart
-  const addBtn = page.locator('button').filter({ hasText: /add to cart|aggiungi/i }).first();
-  if (await addBtn.isVisible().catch(() => false)) {
+  // Tenta click su "Add to cart"
+  const addBtn = page.locator('button').filter({ hasText: /add to cart|aggiungi al carrello/i }).first();
+  if (await addBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await addBtn.click();
     await sleep(randomInt(1000, 2000));
   }
 
-  // Vai al cart
-  await page.goto(SITE_URL + '/cart.html', { waitUntil: 'networkidle' }).catch(() => {});
+  await page.goto(SITE_URL + '/cart.html', { waitUntil: 'networkidle' });
   await humanScroll(page);
   await sleep(randomInt(5000, 12000));
-  // Abbandona (non fa checkout)
+  // Abbandona qui
 }
 
 async function journeyFullPurchase(page, source) {
   await journeyBrowseOnly(page, source);
 
   // Add to cart
-  const addBtn = page.locator('button').filter({ hasText: /add to cart|aggiungi/i }).first();
-  if (await addBtn.isVisible().catch(() => false)) {
+  const addBtn = page.locator('button').filter({ hasText: /add to cart|aggiungi al carrello/i }).first();
+  if (await addBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await addBtn.click();
     await sleep(randomInt(1000, 2000));
   }
 
   // Cart
-  await page.goto(SITE_URL + '/cart.html', { waitUntil: 'networkidle' }).catch(() => {});
+  await page.goto(SITE_URL + '/cart.html', { waitUntil: 'networkidle' });
   await sleep(randomInt(2000, 4000));
 
   // Checkout
-  await page.goto(SITE_URL + '/checkout.html', { waitUntil: 'networkidle' }).catch(() => {});
+  await page.goto(SITE_URL + '/checkout.html', { waitUntil: 'networkidle' });
   await humanScroll(page);
-  await sleep(randomInt(8000, 15000));
+  await sleep(randomInt(3000, 6000));
 
-  // Compila form checkout (adatta i selettori al tuo sito)
+  // Compila anagrafica — adatta i selettori se necessario
   const fields = [
-    { selector: 'input[name="name"], input[placeholder*="name" i], #name', value: randomName() },
-    { selector: 'input[name="email"], input[type="email"], #email', value: randomEmail() },
-    { selector: 'input[name="address"], input[placeholder*="address" i], #address', value: randomAddress() },
+    { selector: 'input[name="name"], input[id="name"], input[placeholder*="nome" i]', value: randomName() },
+    { selector: 'input[name="email"], input[type="email"], input[id="email"]', value: randomEmail() },
+    { selector: 'input[name="address"], input[id="address"], input[placeholder*="indirizzo" i]', value: randomAddress() },
+    { selector: 'input[name="city"], input[id="city"], input[placeholder*="città" i]', value: 'Milano' },
+    { selector: 'input[name="zip"], input[id="zip"], input[placeholder*="cap" i]', value: '20100' },
   ];
+
   for (const field of fields) {
     const el = page.locator(field.selector).first();
-    if (await el.isVisible().catch(() => false)) {
+    if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
       await el.fill(field.value);
       await sleep(randomInt(300, 700));
     }
   }
 
-  // Submit
-  const submitBtn = page.locator('button[type="submit"], button').filter({ hasText: /place order|completa|acquista/i }).first();
-  if (await submitBtn.isVisible().catch(() => false)) {
+  await sleep(randomInt(2000, 4000));
+
+  // Submit ordine
+  const submitBtn = page.locator('button[type="submit"], button').filter({ hasText: /completa|place order|acquista|conferma/i }).first();
+  if (await submitBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await submitBtn.click();
-    await page.waitForURL('**/thank-you**', { timeout: 10000 }).catch(() => {});
+    await page.waitForURL('**/thankyou**', { timeout: 10000 }).catch(() => {});
   } else {
-    // Vai direttamente alla thank-you se il form non è compilabile
-    await page.goto(SITE_URL + '/thank-you.html', { waitUntil: 'networkidle' }).catch(() => {});
+    await page.goto(SITE_URL + '/thankyou.html', { waitUntil: 'networkidle' });
   }
 
   await sleep(randomInt(3000, 6000));
 }
 
-// ─── FAKE DATA GENERATORS ──────────────────────────────────────────────────
 function randomName() {
   const first = ['Luca', 'Marco', 'Anna', 'Sara', 'Giulia', 'Paolo', 'Elena', 'Matteo'];
   const last = ['Rossi', 'Ferrari', 'Bianchi', 'Romano', 'Colombo', 'Ricci'];
@@ -172,17 +165,16 @@ function randomName() {
 }
 
 function randomEmail() {
-  const domains = ['gmail.com', 'yahoo.it', 'hotmail.com', 'libero.it', 'outlook.com'];
+  const domains = ['gmail.com', 'yahoo.it', 'hotmail.com', 'libero.it'];
   const rand = Math.random().toString(36).substring(2, 8);
   return `test.${rand}@${domains[randomInt(0, domains.length - 1)]}`;
 }
 
 function randomAddress() {
   const streets = ['Via Roma', 'Corso Italia', 'Via Garibaldi', 'Piazza Duomo', 'Via Manzoni'];
-  return `${streets[randomInt(0, streets.length - 1)]} ${randomInt(1, 100)}, Milano`;
+  return `${streets[randomInt(0, streets.length - 1)]} ${randomInt(1, 100)}`;
 }
 
-// ─── SESSION RUNNER ─────────────────────────────────────────────────────────
 async function runSession(sessionId) {
   const device = weightedRandom(DEVICES);
   const source = SOURCES[randomInt(0, SOURCES.length - 1)];
@@ -195,17 +187,20 @@ async function runSession(sessionId) {
     userAgent: device.userAgent,
     viewport: device.viewport,
     isMobile: device.isMobile,
-    ...(BASIC_AUTH_USER ? { httpCredentials: { username: BASIC_AUTH_USER, password: BASIC_AUTH_PASS } } : {}),
+    httpCredentials: {
+      username: BASIC_AUTH_USER,
+      password: BASIC_AUTH_PASS,
+    },
   });
 
   const page = await context.newPage();
 
   try {
     switch (journey.name) {
-      case 'bounce':           await journeyBounce(page, source); break;
-      case 'browse_only':      await journeyBrowseOnly(page, source); break;
-      case 'add_no_purchase':  await journeyAddNoPurchase(page, source); break;
-      case 'full_purchase':    await journeyFullPurchase(page, source); break;
+      case 'bounce':          await journeyBounce(page, source); break;
+      case 'browse_only':     await journeyBrowseOnly(page, source); break;
+      case 'add_no_purchase': await journeyAddNoPurchase(page, source); break;
+      case 'full_purchase':   await journeyFullPurchase(page, source); break;
     }
     console.log(`[Session ${sessionId}] ✓ completata`);
   } catch (err) {
@@ -216,7 +211,6 @@ async function runSession(sessionId) {
   }
 }
 
-// ─── MAIN ──────────────────────────────────────────────────────────────────
 async function main() {
   console.log(`🚀 Avvio simulazione: ${TOTAL_SESSIONS} sessioni, concurrency ${CONCURRENCY}`);
 
@@ -229,7 +223,6 @@ async function main() {
       while (active < CONCURRENCY && queue.length > 0) {
         const id = queue.shift();
         active++;
-        // Delay random tra sessioni (0-30s) per evitare burst
         const delay = randomInt(0, 30000);
         sleep(delay).then(() => runSession(id)).then(() => {
           active--;
