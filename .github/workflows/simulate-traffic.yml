@@ -27,9 +27,7 @@ jobs:
           npm install
 
       - name: Install Playwright browsers
-        run: |
-          cd scripts
-          npx playwright install chromium --with-deps
+        run: npx playwright install chromium --with-deps
 
       - name: Run traffic simulator
         env:
