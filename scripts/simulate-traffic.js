@@ -72,6 +72,27 @@ async function humanScroll(page) {
   }
 }
 
+function randomFirstName() {
+  const names = ['Luca', 'Marco', 'Anna', 'Sara', 'Giulia', 'Paolo', 'Elena', 'Matteo', 'Chiara', 'Davide'];
+  return names[randomInt(0, names.length - 1)];
+}
+
+function randomLastName() {
+  const names = ['Rossi', 'Ferrari', 'Bianchi', 'Romano', 'Colombo', 'Ricci', 'Esposito', 'Bruno'];
+  return names[randomInt(0, names.length - 1)];
+}
+
+function randomEmail() {
+  const domains = ['gmail.com', 'yahoo.it', 'hotmail.com', 'libero.it'];
+  const rand = Math.random().toString(36).substring(2, 8);
+  return `test.${rand}@${domains[randomInt(0, domains.length - 1)]}`;
+}
+
+function randomAddress() {
+  const streets = ['Via Roma', 'Corso Italia', 'Via Garibaldi', 'Piazza Duomo', 'Via Manzoni'];
+  return `${streets[randomInt(0, streets.length - 1)]} ${randomInt(1, 100)}`;
+}
+
 async function journeyBounce(page, source) {
   await page.goto(buildUrl('/', source), { waitUntil: 'networkidle' });
   await humanScroll(page);
@@ -95,8 +116,7 @@ async function journeyBrowseOnly(page, source) {
 async function journeyAddNoPurchase(page, source) {
   await journeyBrowseOnly(page, source);
 
-  // Tenta click su "Add to cart"
-  const addBtn = page.locator('button').filter({ hasText: /add to cart|aggiungi al carrello/i }).first();
+  const addBtn = page.locator('button').filter({ hasText: /add to cart/i }).first();
   if (await addBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await addBtn.click();
     await sleep(randomInt(1000, 2000));
@@ -105,14 +125,13 @@ async function journeyAddNoPurchase(page, source) {
   await page.goto(SITE_URL + '/cart.html', { waitUntil: 'networkidle' });
   await humanScroll(page);
   await sleep(randomInt(5000, 12000));
-  // Abbandona qui
 }
 
 async function journeyFullPurchase(page, source) {
   await journeyBrowseOnly(page, source);
 
   // Add to cart
-  const addBtn = page.locator('button').filter({ hasText: /add to cart|aggiungi al carrello/i }).first();
+  const addBtn = page.locator('button').filter({ hasText: /add to cart/i }).first();
   if (await addBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await addBtn.click();
     await sleep(randomInt(1000, 2000));
@@ -125,29 +144,83 @@ async function journeyFullPurchase(page, source) {
   // Checkout
   await page.goto(SITE_URL + '/checkout.html', { waitUntil: 'networkidle' });
   await humanScroll(page);
-  await sleep(randomInt(3000, 6000));
-
-  // Compila anagrafica — adatta i selettori se necessario
-  const fields = [
-    { selector: 'input[name="name"], input[id="name"], input[placeholder*="nome" i]', value: randomName() },
-    { selector: 'input[name="email"], input[type="email"], input[id="email"]', value: randomEmail() },
-    { selector: 'input[name="address"], input[id="address"], input[placeholder*="indirizzo" i]', value: randomAddress() },
-    { selector: 'input[name="city"], input[id="city"], input[placeholder*="città" i]', value: 'Milano' },
-    { selector: 'input[name="zip"], input[id="zip"], input[placeholder*="cap" i]', value: '20100' },
-  ];
-
-  for (const field of fields) {
-    const el = page.locator(field.selector).first();
-    if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await el.fill(field.value);
-      await sleep(randomInt(300, 700));
-    }
-  }
-
   await sleep(randomInt(2000, 4000));
 
-  // Submit ordine
-  const submitBtn = page.locator('button[type="submit"], button').filter({ hasText: /completa|place order|acquista|conferma/i }).first();
+  // Email
+  const email = page.locator('input[placeholder="your@email.com"], input[type="email"]').first();
+  if (await email.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await email.fill(randomEmail());
+    await sleep(randomInt(300, 600));
+  }
+
+  // First name
+  const firstName = page.locator('input[placeholder="Mario"]').first();
+  if (await firstName.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await firstName.fill(randomFirstName());
+    await sleep(randomInt(300, 600));
+  }
+
+  // Last name
+  const lastName = page.locator('input[placeholder="Rossi"]').first();
+  if (await lastName.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await lastName.fill(randomLastName());
+    await sleep(randomInt(300, 600));
+  }
+
+  // Address
+  const address = page.locator('input[placeholder="Via Roma, 1"]').first();
+  if (await address.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await address.fill(randomAddress());
+    await sleep(randomInt(300, 600));
+  }
+
+  // City
+  const city = page.locator('input[placeholder="Milano"]').first();
+  if (await city.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await city.fill('Milano');
+    await sleep(randomInt(300, 600));
+  }
+
+  // Postal code
+  const zip = page.locator('input[placeholder="20121"]').first();
+  if (await zip.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await zip.fill(String(randomInt(10000, 99999)));
+    await sleep(randomInt(300, 600));
+  }
+
+  // Shipping method — random tra Standard e Express
+  const shippingOptions = page.locator('input[type="radio"]');
+  const count = await shippingOptions.count();
+  if (count > 0) {
+    await shippingOptions.nth(randomInt(0, count - 1)).click();
+    await sleep(randomInt(500, 1000));
+  }
+
+  // Card number
+  const card = page.locator('input[placeholder="1234 5678 9012 3456"]').first();
+  if (await card.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await card.fill('4111 1111 1111 1111');
+    await sleep(randomInt(300, 600));
+  }
+
+  // Expiry
+  const expiry = page.locator('input[placeholder="MM / YY"]').first();
+  if (await expiry.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await expiry.fill('12 / 27');
+    await sleep(randomInt(300, 600));
+  }
+
+  // CVV
+  const cvv = page.locator('input[placeholder="123"]').first();
+  if (await cvv.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await cvv.fill(String(randomInt(100, 999)));
+    await sleep(randomInt(300, 600));
+  }
+
+  await sleep(randomInt(1000, 3000));
+
+  // Place Order
+  const submitBtn = page.locator('button').filter({ hasText: /place order/i }).first();
   if (await submitBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await submitBtn.click();
     await page.waitForURL('**/thankyou**', { timeout: 10000 }).catch(() => {});
@@ -156,23 +229,6 @@ async function journeyFullPurchase(page, source) {
   }
 
   await sleep(randomInt(3000, 6000));
-}
-
-function randomName() {
-  const first = ['Luca', 'Marco', 'Anna', 'Sara', 'Giulia', 'Paolo', 'Elena', 'Matteo'];
-  const last = ['Rossi', 'Ferrari', 'Bianchi', 'Romano', 'Colombo', 'Ricci'];
-  return `${first[randomInt(0, first.length - 1)]} ${last[randomInt(0, last.length - 1)]}`;
-}
-
-function randomEmail() {
-  const domains = ['gmail.com', 'yahoo.it', 'hotmail.com', 'libero.it'];
-  const rand = Math.random().toString(36).substring(2, 8);
-  return `test.${rand}@${domains[randomInt(0, domains.length - 1)]}`;
-}
-
-function randomAddress() {
-  const streets = ['Via Roma', 'Corso Italia', 'Via Garibaldi', 'Piazza Duomo', 'Via Manzoni'];
-  return `${streets[randomInt(0, streets.length - 1)]} ${randomInt(1, 100)}`;
 }
 
 async function runSession(sessionId) {
