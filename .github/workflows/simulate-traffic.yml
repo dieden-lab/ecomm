@@ -1,0 +1,42 @@
+name: Simulate GA4 Traffic
+
+on:
+  workflow_dispatch:
+    inputs:
+      sessions:
+        description: 'Numero di sessioni da simulare'
+        required: true
+        default: '100'
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd scripts
+          npm install
+
+      - name: Install Playwright browsers
+        run: |
+          cd scripts
+          npx playwright install chromium --with-deps
+
+      - name: Run traffic simulator
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}
+          BASIC_AUTH_PASS: ${{ secrets.BASIC_AUTH_PASS }}
+          SESSIONS: ${{ github.event.inputs.sessions }}
+        run: |
+          cd scripts
+          node simulate-traffic.js
