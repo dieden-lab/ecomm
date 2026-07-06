@@ -9,7 +9,7 @@ on:
       sessions:
         description: 'Numero di sessioni da simulare'
         required: true
-        default: '100'
+        default: '50'
 
 jobs:
   simulate:
