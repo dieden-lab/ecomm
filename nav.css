@@ -257,37 +257,26 @@
 .nav-mega-col-link {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 7px 0;
-  font-size: 13px;
+  gap: 6px;
+  padding: 9px 0;
+  font-size: 14px;
   font-weight: 400;
   color: var(--charcoal);
   text-decoration: none;
-  transition: color 0.2s, padding-left 0.2s;
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid var(--border);
+  transition: color 0.2s, gap 0.2s;
 }
-.nav-mega-col-link:hover {
-  color: var(--blue);
-  padding-left: 6px;
-}
+.nav-mega-col-link:last-child { border-bottom: none; }
+.nav-mega-col-link:hover { color: var(--blue); gap: 10px; }
 .nav-mega-col-link svg {
-  width: 10px; height: 10px;
+  width: 12px; height: 12px;
+  flex-shrink: 0;
+  margin-left: auto;
   opacity: 0;
   transition: opacity 0.2s;
-  color: var(--red);
-}
-.nav-mega-col-link:hover svg { opacity: 1; }
-
-.nav-mega-col-link.highlighted {
-  font-weight: 600;
   color: var(--blue);
 }
-.nav-mega-col-link.highlighted::before {
-  content: '●';
-  font-size: 6px;
-  margin-right: 6px;
-  color: var(--red);
-}
+.nav-mega-col-link:hover svg { opacity: 1; }
 
 /* ── MEGAMENU: CARD PROMO ── */
 .nav-mega-promo {
