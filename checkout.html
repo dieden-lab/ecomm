@@ -18,6 +18,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-WS8TNH2G');</script>
 <!-- End Google Tag Manager -->
  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="nav.css">
   
 </head>
 <body>
@@ -26,26 +27,345 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
-  <nav class="nav">
-    <div class="nav-inner">
-      
-      <div class="nav-left">
-        <a href="plp.html" >Collection</a>
-        <a href="plp.html?cat=Outerwear">Outerwear</a>
-        <a href="plp.html?cat=Knitwear">Knitwear</a>
-      </div>
-      <a href="index.html" class="nav-logo">Merkle<span>Shop</span></a>
-      <div class="nav-right">
-        <a href="cart.html" class="cart-btn">
-          <span>Cart</span>
-          <span class="cart-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            <span id="cart-count"></span>
-          </span>
-        </a>
-      </div>
+  <!-- ═══════════════════════════════════════════════
+     MERKLESHOP MEGAMENU
+     Incolla questo blocco in tutti e 6 gli HTML
+     al posto del vecchio <nav class="nav">...</nav>
+     ═══════════════════════════════════════════════ -->
+
+<!-- Overlay (fuori dal nav, subito dopo) -->
+<div class="nav-overlay" id="nav-overlay"></div>
+
+<nav class="nav">
+
+  <!-- TOP BAR -->
+  <div class="nav-top">
+    <div class="nav-top-left">
+      <span class="nav-top-link">Demo Store</span>
+      <span class="nav-top-link" style="color:var(--red)">Free shipping over €200</span>
     </div>
-  </nav>
+    <div class="nav-top-right">
+      <a href="cart.html" class="nav-cart-btn">
+        <span>Cart</span>
+        <span class="nav-cart-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <span id="cart-count"></span>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="nav-bottom">
+
+    <!-- Logo -->
+    <a href="index.html" class="nav-logo">Merkle<span>Shop</span></a>
+
+    <!-- Menu desktop -->
+    <ul class="nav-menu">
+
+      <!-- OUTERWEAR (con megamenu) -->
+      <li class="nav-item" data-mega>
+        <button class="nav-item-btn" aria-expanded="false" aria-haspopup="true">
+          Outerwear
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+        <div class="nav-megamenu">
+          <div class="nav-megamenu-inner">
+            <!-- Titolo sezione -->
+            <div>
+              <div class="nav-mega-heading">
+                <a href="plp.html?cat=Outerwear">
+                  Outerwear
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </a>
+              </div>
+              <p class="nav-mega-desc">Cappotti, blazer e giacche senza tempo. Costruiti per durare stagioni.</p>
+            </div>
+            <!-- Colonne -->
+            <div class="nav-mega-cols">
+              <div>
+                <div class="nav-mega-col-title">Capi</div>
+                <ul class="nav-mega-col-list">
+                  <li>
+                    <a href="pdp.html?id=1" class="nav-mega-col-link highlighted">
+                      Oversized Wool Coat
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="pdp.html?id=7" class="nav-mega-col-link highlighted">
+                      Structured Blazer
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="pdp.html?id=8" class="nav-mega-col-link">
+                      Denim Jacket
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="plp.html?cat=Outerwear" class="nav-mega-col-link" style="margin-top:8px;color:var(--blue);font-weight:600">
+                      Vedi tutti →
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- Card promo -->
+            <div class="nav-mega-promo">
+              <div class="nav-mega-promo-label">New arrival</div>
+              <div class="nav-mega-promo-title">Denim Jacket SS25</div>
+              <div class="nav-mega-promo-desc">12oz raw selvedge denim. Boxy cut, minimal hardware.</div>
+              <a href="pdp.html?id=8" class="nav-mega-promo-cta">
+                Shop now
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- KNITWEAR & TOPS (con megamenu) -->
+      <li class="nav-item" data-mega>
+        <button class="nav-item-btn" aria-expanded="false" aria-haspopup="true">
+          Knitwear & Tops
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+        <div class="nav-megamenu">
+          <div class="nav-megamenu-inner">
+            <div>
+              <div class="nav-mega-heading">
+                <a href="plp.html">
+                  Knitwear & Tops
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+              </div>
+              <p class="nav-mega-desc">Maglieria fine e camicie in lino. Essenziali per ogni stagione.</p>
+            </div>
+            <div class="nav-mega-cols">
+              <div>
+                <div class="nav-mega-col-title">Maglieria</div>
+                <ul class="nav-mega-col-list">
+                  <li>
+                    <a href="pdp.html?id=2" class="nav-mega-col-link highlighted">
+                      Ribbed Turtleneck
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="plp.html?cat=Knitwear" class="nav-mega-col-link">
+                      Vedi Knitwear →
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <div class="nav-mega-col-title">Tops</div>
+                <ul class="nav-mega-col-list">
+                  <li>
+                    <a href="pdp.html?id=10" class="nav-mega-col-link highlighted">
+                      Oversized Linen Shirt
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="plp.html?cat=Tops" class="nav-mega-col-link">
+                      Vedi Tops →
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="nav-mega-promo">
+              <div class="nav-mega-promo-label">Bestseller</div>
+              <div class="nav-mega-promo-title">Ribbed Turtleneck</div>
+              <div class="nav-mega-promo-desc">70% Wool, 30% Cashmere. Il capo più venduto della stagione.</div>
+              <a href="pdp.html?id=2" class="nav-mega-promo-cta">
+                Shop now
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- BOTTOMS (con megamenu) -->
+      <li class="nav-item" data-mega>
+        <button class="nav-item-btn" aria-expanded="false" aria-haspopup="true">
+          Bottoms
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+        <div class="nav-megamenu">
+          <div class="nav-megamenu-inner">
+            <div>
+              <div class="nav-mega-heading">
+                <a href="plp.html">
+                  Bottoms
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+              </div>
+              <p class="nav-mega-desc">Pantaloni, gonne e abiti dal taglio impeccabile.</p>
+            </div>
+            <div class="nav-mega-cols">
+              <div>
+                <div class="nav-mega-col-title">Pantaloni</div>
+                <ul class="nav-mega-col-list">
+                  <li>
+                    <a href="pdp.html?id=3" class="nav-mega-col-link highlighted">
+                      Wide-Leg Trousers
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="plp.html?cat=Trousers" class="nav-mega-col-link">Vedi Trousers →</a>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <div class="nav-mega-col-title">Gonne & Abiti</div>
+                <ul class="nav-mega-col-list">
+                  <li>
+                    <a href="pdp.html?id=9" class="nav-mega-col-link highlighted">
+                      Pleated Midi Skirt
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="pdp.html?id=4" class="nav-mega-col-link highlighted">
+                      Silk Slip Dress
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="plp.html?cat=Skirts" class="nav-mega-col-link">Vedi Skirts →</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="nav-mega-promo">
+              <div class="nav-mega-promo-label">New in</div>
+              <div class="nav-mega-promo-title">Silk Slip Dress</div>
+              <div class="nav-mega-promo-desc">Bias-cut silk. Minimal seaming for an uninterrupted drape.</div>
+              <a href="pdp.html?id=4" class="nav-mega-promo-cta">
+                Shop now
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- ACCESSORIES (link diretto, senza megamenu) -->
+      <li class="nav-item">
+        <a href="plp.html?cat=Accessories" class="nav-item-link">Accessories</a>
+      </li>
+
+      <!-- ALL (link diretto) -->
+      <li class="nav-item">
+        <a href="plp.html" class="nav-item-link">All Products</a>
+      </li>
+
+    </ul>
+
+    <!-- Hamburger mobile -->
+    <button class="nav-hamburger" aria-label="Menu" id="nav-hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+  </div><!-- /nav-bottom -->
+
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div class="nav-drawer" id="nav-drawer">
+  <div class="nav-drawer-header">
+    <a href="index.html" class="nav-drawer-logo">Merkle<span>Shop</span></a>
+    <button class="nav-drawer-close" aria-label="Chiudi menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Outerwear accordion -->
+  <div class="nav-drawer-item">
+    <button class="nav-drawer-btn">
+      Outerwear
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+    <div class="nav-drawer-sub">
+      <a href="pdp.html?id=1" class="nav-drawer-sub-link">Oversized Wool Coat</a>
+      <a href="pdp.html?id=7" class="nav-drawer-sub-link">Structured Blazer</a>
+      <a href="pdp.html?id=8" class="nav-drawer-sub-link">Denim Jacket</a>
+      <a href="plp.html?cat=Outerwear" class="nav-drawer-sub-link" style="color:var(--red)">Vedi tutti →</a>
+    </div>
+  </div>
+
+  <!-- Knitwear & Tops accordion -->
+  <div class="nav-drawer-item">
+    <button class="nav-drawer-btn">
+      Knitwear & Tops
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+    <div class="nav-drawer-sub">
+      <a href="pdp.html?id=2" class="nav-drawer-sub-link">Ribbed Turtleneck</a>
+      <a href="pdp.html?id=10" class="nav-drawer-sub-link">Oversized Linen Shirt</a>
+      <a href="plp.html?cat=Knitwear" class="nav-drawer-sub-link" style="color:var(--red)">Vedi Knitwear →</a>
+      <a href="plp.html?cat=Tops" class="nav-drawer-sub-link" style="color:var(--red)">Vedi Tops →</a>
+    </div>
+  </div>
+
+  <!-- Bottoms accordion -->
+  <div class="nav-drawer-item">
+    <button class="nav-drawer-btn">
+      Bottoms
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+    <div class="nav-drawer-sub">
+      <a href="pdp.html?id=3" class="nav-drawer-sub-link">Wide-Leg Trousers</a>
+      <a href="pdp.html?id=9" class="nav-drawer-sub-link">Pleated Midi Skirt</a>
+      <a href="pdp.html?id=4" class="nav-drawer-sub-link">Silk Slip Dress</a>
+      <a href="plp.html?cat=Trousers" class="nav-drawer-sub-link" style="color:var(--red)">Vedi Trousers →</a>
+      <a href="plp.html?cat=Skirts" class="nav-drawer-sub-link" style="color:var(--red)">Vedi Skirts →</a>
+    </div>
+  </div>
+
+  <!-- Link diretti -->
+  <a href="plp.html?cat=Accessories" class="nav-drawer-sub-link-direct">Accessories</a>
+  <a href="plp.html" class="nav-drawer-sub-link-direct">All Products</a>
+
+  <!-- Cart -->
+  <a href="cart.html" class="nav-drawer-cart">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <path d="M16 10a4 4 0 0 1-8 0"/>
+    </svg>
+    Cart
+  </a>
+</div>
 
   
   <main class="container">
@@ -212,5 +532,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       window.location.href = 'thankyou.html';
     }
   </script>
+  <script src="nav.js"></script>
 </body>
 </html>
