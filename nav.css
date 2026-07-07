@@ -509,3 +509,14 @@
   gap: 20px;
   margin-left: auto;
 }
+
+
+/* ── NAV BOTTOM FIX ── */
+.nav { position: relative; }
+.nav-bottom { position: relative; justify-content: space-between; }
+.nav-bottom-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-left: auto;
+}
