@@ -9,14 +9,7 @@
 .nav-left a { all: unset; }
 
 /* ── HEADER SHELL ── */
-.nav {
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  /* sticky fix */
-  background: var(--blue-dark);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-}
+
 
 /* ── TOP BAR ── */
 .nav-top { display: none; }
@@ -501,20 +494,20 @@
   .nav-hamburger { display: none !important; }
 }
 
-/* ── NAV BOTTOM FIX ── */
-.nav { position: relative; }
-.nav-bottom { position: relative; justify-content: space-between; }
-.nav-bottom-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-left: auto;
+
+
+
+
+
+/* ── NAV STICKY ── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: var(--blue-dark);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  width: 100%;
 }
-
-
-/* ── NAV BOTTOM FIX ── */
-.nav { position: relative; }
-.nav-bottom { position: relative; justify-content: space-between; }
 .nav-bottom-right {
   display: flex;
   align-items: center;
