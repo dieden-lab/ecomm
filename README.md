@@ -1,4 +1,4 @@
-# Arco Studio — Demo E-commerce
+# Demo E-commerce
 
 Static e-commerce demo store. 10 prodotti, full funnel GA4-ready.
 
