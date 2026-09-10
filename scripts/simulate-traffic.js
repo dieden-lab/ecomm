@@ -120,7 +120,7 @@ async function journeyBrowseOnly(page, source) {
 async function journeyAddNoPurchase(page, source) {
   await journeyBrowseOnly(page, source);
 
-  const addBtn = page.locator('button').filter({ hasText: /add to cart/i }).first();
+  const addBtn = page.locator('#add-btn').first();
   if (await addBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await addBtn.click();
     await sleep(randomInt(1000, 2000));
@@ -136,7 +136,7 @@ async function journeyFullPurchase(page, source) {
   await journeyBrowseOnly(page, source);
 
   // Add to cart
-  const addBtn = page.locator('button').filter({ hasText: /add to cart/i }).first();
+  const addBtn = page.locator('#add-btn').first();
   if (await addBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await addBtn.click();
     await sleep(randomInt(1000, 2000));
