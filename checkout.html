@@ -472,10 +472,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     });
 
     // Card number formatting
-    document.getElementById('f-card').addEventListener('input', e => {
-      let v = e.target.value.replace(/\D/g,'').substring(0,16);
-      e.target.value = v.replace(/(.{4})/g,'$1 ').trim();
+document.getElementById('f-card').addEventListener('input', e => {
+  let v = e.target.value.replace(/\D/g,'').substring(0,16);
+  e.target.value = v.replace(/(.{4})/g,'$1 ').trim();
+
+  // add_payment_info — si triggera una sola volta al primo input
+  if (!window._paymentInfoFired && v.length >= 4) {
+    window._paymentInfoFired = true;
+    dataLayer.push({ ecommerce: null });
+    dataLayer.push({
+      event: 'add_payment_info',
+      ecommerce: {
+        currency: 'EUR',
+        value: subtotal + shippingCost,
+        payment_type: 'Credit Card',
+        items: Cart.getItemsForDL()
+      }
     });
+  }
+});
     document.getElementById('f-exp').addEventListener('input', e => {
       let v = e.target.value.replace(/\D/g,'').substring(0,4);
       if (v.length >= 2) v = v.substring(0,2) + ' / ' + v.substring(2);
