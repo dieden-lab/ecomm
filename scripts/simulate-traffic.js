@@ -208,14 +208,16 @@ async function journeyFullPurchase(page, source) {
     { selector: '#f-exp',  value: '12 / 27' },
     { selector: '#f-cvv',  value: String(randomInt(100, 999)) },
   ];
-
   for (const field of cardFields) {
     const el = page.locator(field.selector).first();
     if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
       await el.fill(field.value);
-      await sleep(randomInt(300, 600));
+      await sleep(randomInt(200, 500));
     }
   }
+  // Attendi beacon add_payment_info prima di procedere
+  await waitForGA4Beacon(page, 4000);
+  console.log('  → add_payment_info fired');
 
   await sleep(randomInt(1000, 2000));
 
