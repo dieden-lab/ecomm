@@ -25,29 +25,21 @@ const DEVICES = [
 ];
 
 const JOURNEYS = [
-  { name: 'bounce', weight: 20 },
-  { name: 'browse_only', weight: 25 },
+  { name: 'bounce',          weight: 20 },
+  { name: 'browse_only',     weight: 25 },
   { name: 'add_no_purchase', weight: 20 },
-  { name: 'full_purchase', weight: 35 },
+  { name: 'full_purchase',   weight: 35 },
 ];
 
 function weightedRandom(items) {
   const total = items.reduce((sum, i) => sum + i.weight, 0);
   let r = Math.random() * total;
-  for (const item of items) {
-    r -= item.weight;
-    if (r <= 0) return item;
-  }
+  for (const item of items) { r -= item.weight; if (r <= 0) return item; }
   return items[items.length - 1];
 }
 
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-async function sleep(ms) {
-  return new Promise(r => setTimeout(r, ms));
-}
+function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function buildUrl(path, source) {
   const url = new URL(SITE_URL + path);
@@ -59,10 +51,7 @@ function buildUrl(path, source) {
   return url.toString();
 }
 
-function randomPdpUrl() {
-  const id = randomInt(1, 10);
-  return `/pdp.html?id=${id}`;
-}
+function randomPdpUrl() { return `/pdp.html?id=${randomInt(1, 10)}`; }
 
 async function humanScroll(page) {
   const scrolls = randomInt(2, 5);
@@ -76,23 +65,46 @@ function randomFirstName() {
   const names = ['Luca', 'Marco', 'Anna', 'Sara', 'Giulia', 'Paolo', 'Elena', 'Matteo', 'Chiara', 'Davide'];
   return names[randomInt(0, names.length - 1)];
 }
-
 function randomLastName() {
   const names = ['Rossi', 'Ferrari', 'Bianchi', 'Romano', 'Colombo', 'Ricci', 'Esposito', 'Bruno'];
   return names[randomInt(0, names.length - 1)];
 }
-
 function randomEmail() {
   const domains = ['gmail.com', 'yahoo.it', 'hotmail.com', 'libero.it'];
   const rand = Math.random().toString(36).substring(2, 8);
   return `test.${rand}@${domains[randomInt(0, domains.length - 1)]}`;
 }
-
 function randomAddress() {
   const streets = ['Via Roma', 'Corso Italia', 'Via Garibaldi', 'Piazza Duomo', 'Via Manzoni'];
   return `${streets[randomInt(0, streets.length - 1)]} ${randomInt(1, 100)}`;
 }
 
+// ── FIX Bug 1: seleziona taglia prima di cliccare add-btn ──────────
+async function addToCart(page) {
+  const sizeBtn = page.locator('.size-btn').first();
+  const sizeVisible = await sizeBtn.isVisible({ timeout: 3000 }).catch(() => false);
+  if (sizeVisible) {
+    await sizeBtn.click();
+    await sleep(randomInt(500, 1000));
+    console.log('  → size selected');
+  }
+
+  const addBtn = page.locator('#add-btn').first();
+  const addVisible = await addBtn.isVisible({ timeout: 3000 }).catch(() => false);
+  if (addVisible) {
+    const isDisabled = await addBtn.isDisabled().catch(() => true);
+    if (!isDisabled) {
+      await addBtn.click();
+      await sleep(randomInt(1000, 2000));
+      console.log('  → add_to_cart fired');
+      return true;
+    }
+  }
+  console.log('  → add_to_cart SKIPPED (btn not ready)');
+  return false;
+}
+
+// ── JOURNEY: bounce ────────────────────────────────────────────────
 async function journeyBounce(page, source) {
   await page.goto(buildUrl('/', source), { waitUntil: 'domcontentloaded' });
   await sleep(randomInt(500, 1000));
@@ -100,6 +112,7 @@ async function journeyBounce(page, source) {
   await sleep(randomInt(3000, 8000));
 }
 
+// ── JOURNEY: browse only ───────────────────────────────────────────
 async function journeyBrowseOnly(page, source) {
   await page.goto(buildUrl('/', source), { waitUntil: 'domcontentloaded' });
   await sleep(randomInt(500, 1000));
@@ -117,157 +130,135 @@ async function journeyBrowseOnly(page, source) {
   await sleep(randomInt(4000, 8000));
 }
 
+// ── JOURNEY: add no purchase ───────────────────────────────────────
 async function journeyAddNoPurchase(page, source) {
   await journeyBrowseOnly(page, source);
-
-  const addBtn = page.locator('#add-btn').first();
-  if (await addBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-    await addBtn.click();
-    await sleep(randomInt(1000, 2000));
-  }
+  await addToCart(page);
 
   await page.goto(SITE_URL + '/cart.html', { waitUntil: 'domcontentloaded' });
   await sleep(randomInt(500, 1000));
   await humanScroll(page);
   await sleep(randomInt(5000, 12000));
+  // Abbandona — non clicca proceed
 }
 
+// ── JOURNEY: full purchase ─────────────────────────────────────────
 async function journeyFullPurchase(page, source) {
   await journeyBrowseOnly(page, source);
 
-  // Add to cart
-  const addBtn = page.locator('#add-btn').first();
-  if (await addBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-    await addBtn.click();
-    await sleep(randomInt(1000, 2000));
+  // FIX Bug 1: size selection + add to cart
+  const added = await addToCart(page);
+  if (!added) {
+    console.log('  → full_purchase aborted: could not add to cart');
+    return;
   }
 
-  // Cart
+  // Cart page
   await page.goto(SITE_URL + '/cart.html', { waitUntil: 'domcontentloaded' });
-  await sleep(randomInt(500, 1000));
-  await sleep(randomInt(2000, 4000));
-
-  // Checkout
-  await page.goto(SITE_URL + '/checkout.html', { waitUntil: 'domcontentloaded' });
-  await sleep(randomInt(500, 1000));
+  await sleep(randomInt(1000, 2000));
   await humanScroll(page);
   await sleep(randomInt(2000, 4000));
 
-  // Email
-  const email = page.locator('input[placeholder="your@email.com"], input[type="email"]').first();
-  if (await email.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await email.fill(randomEmail());
-    await sleep(randomInt(300, 600));
+  // FIX Bug 2: clicca "Proceed to Checkout" → triggera begin_checkout
+  const checkoutBtn = page.locator('button').filter({ hasText: /proceed to checkout/i }).first();
+  const checkoutBtnVisible = await checkoutBtn.isVisible({ timeout: 3000 }).catch(() => false);
+  if (checkoutBtnVisible) {
+    await checkoutBtn.click();
+    await page.waitForURL('**/checkout**', { timeout: 8000 }).catch(() => {});
+    console.log('  → begin_checkout fired');
+    await sleep(randomInt(1000, 2000));
+  } else {
+    await page.goto(SITE_URL + '/checkout.html', { waitUntil: 'domcontentloaded' });
+    console.log('  → checkout direct nav (begin_checkout NOT fired)');
   }
 
-  // First name
-  const firstName = page.locator('input[placeholder="Mario"]').first();
-  if (await firstName.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await firstName.fill(randomFirstName());
-    await sleep(randomInt(300, 600));
+  await sleep(randomInt(1000, 2000));
+  await humanScroll(page);
+
+  // Compila form — IDs aggiornati con prefisso f-
+  const fields = [
+    { selector: '#f-email',   value: randomEmail() },
+    { selector: '#f-fname',   value: randomFirstName() },
+    { selector: '#f-lname',   value: randomLastName() },
+    { selector: '#f-address', value: randomAddress() },
+    { selector: '#f-city',    value: 'Milano' },
+    { selector: '#f-zip',     value: String(randomInt(10000, 99999)) },
+  ];
+
+  for (const field of fields) {
+    const el = page.locator(field.selector).first();
+    if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await el.fill(field.value);
+      await sleep(randomInt(300, 600));
+    }
   }
 
-  // Last name
-  const lastName = page.locator('input[placeholder="Rossi"]').first();
-  if (await lastName.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await lastName.fill(randomLastName());
-    await sleep(randomInt(300, 600));
-  }
-
-  // Address
-  const address = page.locator('input[placeholder="Via Roma, 1"]').first();
-  if (await address.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await address.fill(randomAddress());
-    await sleep(randomInt(300, 600));
-  }
-
-  // City
-  const city = page.locator('input[placeholder="Milano"]').first();
-  if (await city.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await city.fill('Milano');
-    await sleep(randomInt(300, 600));
-  }
-
-  // Postal code
-  const zip = page.locator('input[placeholder="20121"]').first();
-  if (await zip.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await zip.fill(String(randomInt(10000, 99999)));
-    await sleep(randomInt(300, 600));
-  }
-
-  // Shipping method — random tra Standard e Express
-  const shippingOptions = page.locator('input[type="radio"]');
-  const count = await shippingOptions.count();
-  if (count > 0) {
-    await shippingOptions.nth(randomInt(0, count - 1)).click();
+  // FIX Bug 3: clicca Express → change event → add_shipping_info
+  const shippingOptions = page.locator('input[name="ship"]');
+  const shipCount = await shippingOptions.count();
+  if (shipCount > 1) {
+    await shippingOptions.nth(1).click();
     await sleep(randomInt(500, 1000));
+    console.log('  → add_shipping_info fired (express)');
   }
 
-  // Card number
-  const card = page.locator('input[placeholder="1234 5678 9012 3456"]').first();
-  if (await card.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await card.fill('4111 1111 1111 1111');
-    await sleep(randomInt(300, 600));
+  // Dati carta (decorativi)
+  const cardFields = [
+    { selector: '#f-card', value: '4111 1111 1111 1111' },
+    { selector: '#f-exp',  value: '12 / 27' },
+    { selector: '#f-cvv',  value: String(randomInt(100, 999)) },
+  ];
+
+  for (const field of cardFields) {
+    const el = page.locator(field.selector).first();
+    if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await el.fill(field.value);
+      await sleep(randomInt(300, 600));
+    }
   }
 
-  // Expiry
-  const expiry = page.locator('input[placeholder="MM / YY"]').first();
-  if (await expiry.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await expiry.fill('12 / 27');
-    await sleep(randomInt(300, 600));
-  }
-
-  // CVV
-  const cvv = page.locator('input[placeholder="123"]').first();
-  if (await cvv.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await cvv.fill(String(randomInt(100, 999)));
-    await sleep(randomInt(300, 600));
-  }
-
-  await sleep(randomInt(1000, 3000));
+  await sleep(randomInt(1000, 2000));
 
   // Place Order
-  const submitBtn = page.locator('button').filter({ hasText: /place order/i }).first();
+  const submitBtn = page.locator('#place-btn').first();
   if (await submitBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await submitBtn.click();
     await page.waitForURL('**/thankyou**', { timeout: 10000 }).catch(() => {});
+    console.log('  → purchase fired');
+    await sleep(randomInt(3000, 6000));
   } else {
-    await page.goto(SITE_URL + '/thankyou.html', { waitUntil: 'domcontentloaded' });
+    console.log('  → place-btn NOT found');
   }
-
-  await sleep(randomInt(3000, 6000));
 }
 
+// ── RUNNER ─────────────────────────────────────────────────────────
 async function runSession(sessionId) {
-  const device = weightedRandom(DEVICES);
-  const source = SOURCES[randomInt(0, SOURCES.length - 1)];
+  const device  = weightedRandom(DEVICES);
+  const source  = SOURCES[randomInt(0, SOURCES.length - 1)];
   const journey = weightedRandom(JOURNEYS);
 
-  console.log(`[Session ${sessionId}] Device: ${device.name} | Journey: ${journey.name} | Source: ${source.utm_source}`);
+  console.log(`[S${sessionId}] ${device.name} | ${journey.name} | ${source.utm_source}`);
 
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     userAgent: device.userAgent,
     viewport: device.viewport,
     isMobile: device.isMobile,
-    httpCredentials: {
-      username: BASIC_AUTH_USER,
-      password: BASIC_AUTH_PASS,
-    },
+    httpCredentials: { username: BASIC_AUTH_USER, password: BASIC_AUTH_PASS },
   });
 
   const page = await context.newPage();
 
   try {
     switch (journey.name) {
-      case 'bounce':          await journeyBounce(page, source); break;
-      case 'browse_only':     await journeyBrowseOnly(page, source); break;
-      case 'add_no_purchase': await journeyAddNoPurchase(page, source); break;
-      case 'full_purchase':   await journeyFullPurchase(page, source); break;
+      case 'bounce':           await journeyBounce(page, source);         break;
+      case 'browse_only':      await journeyBrowseOnly(page, source);      break;
+      case 'add_no_purchase':  await journeyAddNoPurchase(page, source);   break;
+      case 'full_purchase':    await journeyFullPurchase(page, source);    break;
     }
-    console.log(`[Session ${sessionId}] ✓ completata`);
+    console.log(`[S${sessionId}] ✓`);
   } catch (err) {
-    console.error(`[Session ${sessionId}] ✗ errore:`, err.message);
+    console.error(`[S${sessionId}] ✗`, err.message);
   } finally {
     await context.close();
     await browser.close();
@@ -275,13 +266,11 @@ async function runSession(sessionId) {
 }
 
 async function main() {
-  console.log(`🚀 Avvio simulazione: ${TOTAL_SESSIONS} sessioni, concurrency ${CONCURRENCY}`);
-
+  console.log(`🚀 ${TOTAL_SESSIONS} sessioni, concurrency ${CONCURRENCY}`);
   const queue = Array.from({ length: TOTAL_SESSIONS }, (_, i) => i + 1);
-  let active = 0;
-  let completed = 0;
+  let active = 0, completed = 0;
 
-  await new Promise((resolve) => {
+  await new Promise(resolve => {
     function next() {
       while (active < CONCURRENCY && queue.length > 0) {
         const id = queue.shift();
@@ -299,7 +288,7 @@ async function main() {
     next();
   });
 
-  console.log('✅ Simulazione completata');
+  console.log('✅ Completato');
 }
 
 main().catch(console.error);
