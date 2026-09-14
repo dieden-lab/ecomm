@@ -54,11 +54,36 @@ function buildUrl(path, source) {
 function randomPdpUrl() { return `/pdp.html?id=${randomInt(1, 10)}`; }
 
 async function humanScroll(page) {
-  const scrolls = randomInt(2, 5);
+  const scrolls = randomInt(2, 4);
   for (let i = 0; i < scrolls; i++) {
     await page.evaluate(() => window.scrollBy(0, Math.random() * 400 + 100));
-    await sleep(randomInt(500, 1500));
+    await sleep(randomInt(500, 1200));
   }
+}
+
+// Attende che GTM sia inizializzato
+async function waitForGTM(page, timeout = 5000) {
+  await page.waitForFunction(
+    () => window.dataLayer && window.google_tag_manager,
+    { timeout }
+  ).catch(() => {});
+  await sleep(500);
+}
+
+// Attende che il beacon GA4 venga inviato prima di navigare
+async function waitForGA4Beacon(page, timeout = 3000) {
+  await page.waitForRequest(
+    req => req.url().includes('google-analytics.com/g/collect') ||
+           req.url().includes('analytics.google.com/g/collect'),
+    { timeout }
+  ).catch(() => {});
+  await sleep(1000);
+}
+
+async function gotoAndWait(page, url) {
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await waitForGTM(page);
+  await sleep(randomInt(800, 1500));
 }
 
 function randomFirstName() {
@@ -79,13 +104,13 @@ function randomAddress() {
   return `${streets[randomInt(0, streets.length - 1)]} ${randomInt(1, 100)}`;
 }
 
-// ── FIX Bug 1: seleziona taglia prima di cliccare add-btn ──────────
+// FIX Bug 1: seleziona taglia prima di cliccare add-btn
 async function addToCart(page) {
   const sizeBtn = page.locator('.size-btn').first();
   const sizeVisible = await sizeBtn.isVisible({ timeout: 3000 }).catch(() => false);
   if (sizeVisible) {
     await sizeBtn.click();
-    await sleep(randomInt(500, 1000));
+    await sleep(randomInt(600, 1200));
     console.log('  → size selected');
   }
 
@@ -95,7 +120,7 @@ async function addToCart(page) {
     const isDisabled = await addBtn.isDisabled().catch(() => true);
     if (!isDisabled) {
       await addBtn.click();
-      await sleep(randomInt(1000, 2000));
+      await waitForGA4Beacon(page, 4000);
       console.log('  → add_to_cart fired');
       return true;
     }
@@ -106,28 +131,24 @@ async function addToCart(page) {
 
 // ── JOURNEY: bounce ────────────────────────────────────────────────
 async function journeyBounce(page, source) {
-  await page.goto(buildUrl('/', source), { waitUntil: 'domcontentloaded' });
-  await sleep(randomInt(500, 1000));
+  await gotoAndWait(page, buildUrl('/', source));
   await humanScroll(page);
-  await sleep(randomInt(3000, 8000));
+  await sleep(randomInt(3000, 7000));
 }
 
 // ── JOURNEY: browse only ───────────────────────────────────────────
 async function journeyBrowseOnly(page, source) {
-  await page.goto(buildUrl('/', source), { waitUntil: 'domcontentloaded' });
-  await sleep(randomInt(500, 1000));
+  await gotoAndWait(page, buildUrl('/', source));
   await humanScroll(page);
   await sleep(randomInt(2000, 4000));
 
-  await page.goto(SITE_URL + '/plp.html', { waitUntil: 'domcontentloaded' });
-  await sleep(randomInt(500, 1000));
+  await gotoAndWait(page, SITE_URL + '/plp.html');
   await humanScroll(page);
-  await sleep(randomInt(3000, 6000));
+  await sleep(randomInt(2000, 5000));
 
-  await page.goto(SITE_URL + randomPdpUrl(), { waitUntil: 'domcontentloaded' });
-  await sleep(randomInt(500, 1000));
+  await gotoAndWait(page, SITE_URL + randomPdpUrl());
   await humanScroll(page);
-  await sleep(randomInt(4000, 8000));
+  await sleep(randomInt(3000, 7000));
 }
 
 // ── JOURNEY: add no purchase ───────────────────────────────────────
@@ -135,47 +156,44 @@ async function journeyAddNoPurchase(page, source) {
   await journeyBrowseOnly(page, source);
   await addToCart(page);
 
-  await page.goto(SITE_URL + '/cart.html', { waitUntil: 'domcontentloaded' });
-  await sleep(randomInt(500, 1000));
+  await gotoAndWait(page, SITE_URL + '/cart.html');
   await humanScroll(page);
-  await sleep(randomInt(5000, 12000));
-  // Abbandona — non clicca proceed
+  await sleep(randomInt(4000, 10000));
 }
 
 // ── JOURNEY: full purchase ─────────────────────────────────────────
 async function journeyFullPurchase(page, source) {
   await journeyBrowseOnly(page, source);
 
-  // FIX Bug 1: size selection + add to cart
   const added = await addToCart(page);
   if (!added) {
     console.log('  → full_purchase aborted: could not add to cart');
     return;
   }
 
-  // Cart page
-  await page.goto(SITE_URL + '/cart.html', { waitUntil: 'domcontentloaded' });
-  await sleep(randomInt(1000, 2000));
+  // Cart
+  await gotoAndWait(page, SITE_URL + '/cart.html');
   await humanScroll(page);
   await sleep(randomInt(2000, 4000));
 
-  // FIX Bug 2: clicca "Proceed to Checkout" → triggera begin_checkout
+  // FIX Bug 2: clicca "Proceed to Checkout" → begin_checkout
   const checkoutBtn = page.locator('button').filter({ hasText: /proceed to checkout/i }).first();
   const checkoutBtnVisible = await checkoutBtn.isVisible({ timeout: 3000 }).catch(() => false);
   if (checkoutBtnVisible) {
     await checkoutBtn.click();
+    await waitForGA4Beacon(page, 4000);
     await page.waitForURL('**/checkout**', { timeout: 8000 }).catch(() => {});
     console.log('  → begin_checkout fired');
-    await sleep(randomInt(1000, 2000));
   } else {
-    await page.goto(SITE_URL + '/checkout.html', { waitUntil: 'domcontentloaded' });
+    await gotoAndWait(page, SITE_URL + '/checkout.html');
     console.log('  → checkout direct nav (begin_checkout NOT fired)');
   }
 
+  await waitForGTM(page);
   await sleep(randomInt(1000, 2000));
   await humanScroll(page);
 
-  // Compila form — IDs aggiornati con prefisso f-
+  // Compila form
   const fields = [
     { selector: '#f-email',   value: randomEmail() },
     { selector: '#f-fname',   value: randomFirstName() },
@@ -189,7 +207,7 @@ async function journeyFullPurchase(page, source) {
     const el = page.locator(field.selector).first();
     if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
       await el.fill(field.value);
-      await sleep(randomInt(300, 600));
+      await sleep(randomInt(200, 500));
     }
   }
 
@@ -198,11 +216,11 @@ async function journeyFullPurchase(page, source) {
   const shipCount = await shippingOptions.count();
   if (shipCount > 1) {
     await shippingOptions.nth(1).click();
-    await sleep(randomInt(500, 1000));
+    await waitForGA4Beacon(page, 3000);
     console.log('  → add_shipping_info fired (express)');
   }
 
-  // Dati carta (decorativi)
+  // Carta — il fill di #f-card triggera add_payment_info nel checkout.html
   const cardFields = [
     { selector: '#f-card', value: '4111 1111 1111 1111' },
     { selector: '#f-exp',  value: '12 / 27' },
@@ -215,7 +233,6 @@ async function journeyFullPurchase(page, source) {
       await sleep(randomInt(200, 500));
     }
   }
-  // Attendi beacon add_payment_info prima di procedere
   await waitForGA4Beacon(page, 4000);
   console.log('  → add_payment_info fired');
 
@@ -226,8 +243,10 @@ async function journeyFullPurchase(page, source) {
   if (await submitBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await submitBtn.click();
     await page.waitForURL('**/thankyou**', { timeout: 10000 }).catch(() => {});
+    await waitForGTM(page);
+    await waitForGA4Beacon(page, 5000);
     console.log('  → purchase fired');
-    await sleep(randomInt(3000, 6000));
+    await sleep(randomInt(3000, 5000));
   } else {
     console.log('  → place-btn NOT found');
   }
@@ -277,7 +296,7 @@ async function main() {
       while (active < CONCURRENCY && queue.length > 0) {
         const id = queue.shift();
         active++;
-        const delay = randomInt(0, 30000);
+        const delay = randomInt(0, 20000);
         sleep(delay).then(() => runSession(id)).then(() => {
           active--;
           completed++;
